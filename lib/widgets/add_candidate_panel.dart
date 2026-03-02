@@ -34,6 +34,8 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   String? _selectedFileName;
   Uint8List? _selectedFileBytes;
   bool _isSubmitting = false;
+  bool _isExtracting = false;
+  String? _createdCandidateId;
 
   @override
   void dispose() {
@@ -58,6 +60,67 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
     }
   }
 
+  Future<void> _extractFromResume() async {
+    if (_selectedFileBytes == null) return;
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isExtracting = true);
+
+    try {
+      final dataService = ref.read(dataServiceProvider);
+
+      // Create candidate first if not already created
+      if (_createdCandidateId == null) {
+        final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
+              name: _nameController.text.trim(),
+              email: _emailController.text.trim().isEmpty
+                  ? 'pending@extract.local'
+                  : _emailController.text.trim(),
+              phone: _phoneController.text.trim().isEmpty
+                  ? null
+                  : _phoneController.text.trim(),
+            );
+        _createdCandidateId = candidate.id;
+
+        // Upload the resume
+        await dataService.uploadResume(candidate.id, _selectedFileBytes!);
+      }
+
+      // Extract contact info
+      final info = await dataService.extractResumeInfo(_createdCandidateId!);
+
+      // Populate empty fields
+      if (info['email'] != null && (_emailController.text.isEmpty || _emailController.text == 'pending@extract.local')) {
+        _emailController.text = info['email']!;
+      }
+      if (info['phone'] != null && _phoneController.text.isEmpty) {
+        _phoneController.text = info['phone']!;
+      }
+
+      if (mounted) {
+        final extractedCount = info.values.where((v) => v != null).length;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(extractedCount > 0
+                ? 'Extracted $extractedCount field(s) from resume'
+                : 'Could not extract contact info from resume'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to extract: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isExtracting = false);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -65,22 +128,42 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
     ref.read(saveStatusProvider.notifier).setSaving();
 
     try {
-      final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            phone: _phoneController.text.trim().isEmpty
-                ? null
-                : _phoneController.text.trim(),
-          );
+      String candidateId;
 
-      if (_selectedFileBytes != null) {
-        final dataService = ref.read(dataServiceProvider);
-        await dataService.uploadResume(candidate.id, _selectedFileBytes!);
+      if (_createdCandidateId != null) {
+        // Candidate was already created during extraction, just update it
+        candidateId = _createdCandidateId!;
+        await ref.read(candidatesProvider.notifier).updateCandidate(
+              candidateId,
+              {
+                'name': _nameController.text.trim(),
+                'email': _emailController.text.trim(),
+                'phone': _phoneController.text.trim().isEmpty
+                    ? null
+                    : _phoneController.text.trim(),
+              },
+            );
         await ref.read(candidatesProvider.notifier).refresh();
+      } else {
+        // Create new candidate
+        final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
+              name: _nameController.text.trim(),
+              email: _emailController.text.trim(),
+              phone: _phoneController.text.trim().isEmpty
+                  ? null
+                  : _phoneController.text.trim(),
+            );
+        candidateId = candidate.id;
+
+        if (_selectedFileBytes != null) {
+          final dataService = ref.read(dataServiceProvider);
+          await dataService.uploadResume(candidate.id, _selectedFileBytes!);
+          await ref.read(candidatesProvider.notifier).refresh();
+        }
       }
 
       ref.read(saveStatusProvider.notifier).setSaved();
-      widget.onCreated?.call(candidate.id);
+      widget.onCreated?.call(candidateId);
       widget.onClose();
     } catch (e) {
       ref.read(saveStatusProvider.notifier).setError();
@@ -300,6 +383,20 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
             ),
           ),
         ),
+        if (_selectedFileName != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          TextButton.icon(
+            onPressed: _isExtracting ? null : _extractFromResume,
+            icon: _isExtracting
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.auto_fix_high, size: 18),
+            label: const Text('Extract from Resume'),
+          ),
+        ],
       ],
     );
   }

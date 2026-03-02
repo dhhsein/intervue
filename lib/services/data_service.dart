@@ -44,6 +44,9 @@ abstract class DataService {
   Future<String> uploadResume(String candidateId, Uint8List bytes);
   String getResumeUrl(String candidateId, String filename);
 
+  /// Extract contact info (email, phone) from uploaded resume
+  Future<Map<String, String?>> extractResumeInfo(String candidateId);
+
   // Config
   Future<AppConfig> getConfig();
   Future<AppConfig> saveConfig(AppConfig config);

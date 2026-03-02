@@ -9,6 +9,8 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
 
+import 'package:intervue_server/resume_parser.dart';
+
 late String dataDir;
 late String seedDataDir;
 
@@ -46,6 +48,7 @@ void main(List<String> args) async {
   app.get('/api/questions/<bank>', _getQuestions);
 
   app.post('/api/candidates/<id>/resume', _uploadResume);
+  app.get('/api/candidates/<id>/resume/extract', _extractResumeInfo);
   app.get('/api/files/<path|.*>', _serveFile);
 
   app.get('/api/config', _getConfig);
@@ -549,6 +552,25 @@ Future<Response> _uploadResume(Request request, String id) async {
         headers: {'Content-Type': 'application/json'});
   } catch (e) {
     return _errorResponse('Failed to upload resume: $e', 500);
+  }
+}
+
+Future<Response> _extractResumeInfo(Request request, String id) async {
+  try {
+    final candidateDir = Directory(path.join(dataDir, 'candidates', id));
+    final resumeFile = File(path.join(candidateDir.path, 'resume.pdf'));
+
+    if (!await resumeFile.exists()) {
+      return _errorResponse('Resume not found', 404);
+    }
+
+    final contactInfo = await ResumeParser.extractContactInfo(resumeFile);
+    return Response.ok(
+      jsonEncode(contactInfo),
+      headers: {'Content-Type': 'application/json'},
+    );
+  } catch (e) {
+    return _errorResponse('Failed to parse resume: $e', 500);
   }
 }
 

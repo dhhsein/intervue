@@ -163,6 +163,12 @@ class LocalDataService implements DataService {
   }
 
   @override
+  Future<Map<String, String?>> extractResumeInfo(String candidateId) async {
+    final response = await _dio.get('/api/candidates/$candidateId/resume/extract');
+    return Map<String, String?>.from(response.data as Map);
+  }
+
+  @override
   Future<AppConfig> getConfig() async {
     final response = await _dio.get('/api/config');
     return AppConfig.fromJson(response.data as Map<String, dynamic>);
