@@ -100,43 +100,58 @@ class _CandidateCardState extends State<CandidateCard> {
       children: [
         GradeIndicator(grade: grade, compact: true),
         const SizedBox(height: AppSpacing.xs),
-        Text(
-          candidate.status.displayName,
-          style: AppTypography.bodySmall,
-        ),
+        Text(candidate.status.displayName, style: AppTypography.bodySmall),
       ],
     );
   }
 
   Widget _buildTechnicalContent(Candidate candidate) {
-    final score = candidate.technicalScore;
+    final recommendation = candidate.technicalRecommendation;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (score != null)
-          Row(
-            children: [
-              Text(
-                'Score: ',
-                style: AppTypography.bodySmall,
-              ),
-              Text(
-                score.toStringAsFixed(1),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.getScoreColor(score.round()),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          )
+        if (recommendation != null)
+          _buildRecommendationBadge(recommendation)
         else
-          Text(
-            'Not interviewed',
-            style: AppTypography.bodySmall,
-          ),
+          Text('Not interviewed', style: AppTypography.bodySmall),
         const SizedBox(height: AppSpacing.xs),
         _buildTimeAgo(candidate.updatedAt),
       ],
+    );
+  }
+
+  Widget _buildRecommendationBadge(String recommendation) {
+    Color color;
+    String label;
+    switch (recommendation.toLowerCase()) {
+      case 'advance':
+        color = AppColors.success;
+        label = 'Advance';
+        break;
+      case 'hold':
+        color = AppColors.warning;
+        label = 'Hold';
+        break;
+      case 'reject':
+        color = AppColors.error;
+        label = 'Reject';
+        break;
+      default:
+        color = AppColors.textTertiary;
+        label = recommendation;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.label.copyWith(color: color),
+      ),
     );
   }
 
@@ -148,10 +163,7 @@ class _CandidateCardState extends State<CandidateCard> {
         if (score != null)
           Row(
             children: [
-              Text(
-                'Score: ',
-                style: AppTypography.bodySmall,
-              ),
+              Text('Score: ', style: AppTypography.bodySmall),
               Text(
                 score.toStringAsFixed(1),
                 style: AppTypography.bodySmall.copyWith(
@@ -165,10 +177,8 @@ class _CandidateCardState extends State<CandidateCard> {
           )
         else
           Text(
-            'Pending...',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.warning,
-            ),
+            'Pending',
+            style: AppTypography.bodySmall.copyWith(color: AppColors.warning),
           ),
       ],
     );

@@ -1,6 +1,6 @@
 # InterVue — Implementation Plan
 
-## Quick Start (for continuing implementation)
+## Quick Start
 
 ```bash
 # Terminal 1: Start the server
@@ -12,7 +12,7 @@ cd /Users/dan/Documents/intervue
 flutter run -d chrome
 ```
 
-**Current Status:** Phase 5 ✅ Complete | **Next:** Phase 6 - Polish + Quality of Life
+**Status:** ✅ Implementation Complete (Phases 1-5)
 
 ---
 
@@ -120,22 +120,20 @@ Each phase is scoped to be completable in a single Claude Code session. After co
 6. **Router** (`lib/router/app_router.dart`):
    - Routes: `/`, `/candidate/:id`, `/candidate/:id/questions`, `/candidate/:id/interview`, `/candidate/:id/interview/summary`, `/compare`
 
-7. **Placeholder Screens** (`lib/screens/`):
-   - `dashboard/dashboard_screen.dart`
-   - `candidate/candidate_detail_screen.dart`
-   - `interview/question_bank_screen.dart`
-   - `interview/interview_session_screen.dart`
-   - `interview/interview_summary_screen.dart`
-   - `compare/compare_screen.dart`
+7. **Screens** (`lib/screens/`):
+   - `dashboard/dashboard_screen.dart` — Implemented in Phase 2
+   - `candidate/candidate_detail_screen.dart` — Implemented in Phase 2
+   - `interview/question_bank_screen.dart` — Implemented in Phase 4
+   - `interview/interview_session_screen.dart` — Implemented in Phase 4
+   - `interview/interview_summary_screen.dart` — Implemented in Phase 4
+   - `compare/compare_screen.dart` — Implemented in Phase 5
 
 8. **Sample Data** (`sample_data/`):
    - `config.json` - App configuration with email templates
    - `questions/screening.json` - 10 screening questions with input types
    - `questions/technical.json` - 14 technical questions with fraud probes
    - `questions/general.json` - 12 general questions
-   - `candidates/c_001_arjun_mehta/` - Status: technical, grade: strong
-   - `candidates/c_002_priya_sharma/` - Status: screening_done, grade: maybe
-   - `candidates/c_003_rahul_iyer/` - Status: assignment, has technical round data
+   - No sample candidates - fresh installs start with empty candidate list
 
 9. **Scripts**:
    - `start.sh` - Launches server and Flutter web together
@@ -143,21 +141,12 @@ Each phase is scoped to be completable in a single Claude Code session. After co
 **Acceptance Criteria:**
 - [x] `dart run bin/server.dart` starts without errors on port 3001
 - [x] `flutter run -d chrome` opens the app without errors
-- [x] `GET localhost:3001/api/candidates` returns sample candidate JSON
+- [x] `GET localhost:3001/api/candidates` returns empty array on fresh install
 - [x] `GET localhost:3001/api/questions/technical` returns question bank JSON
 - [x] No CORS errors in browser console
 - [x] Theme applies correctly (dark background, Crimson accent, Jost font)
 - [x] All routes navigate without errors (even if screens are empty)
 - [x] `start.sh` launches both server and app
-
-**To Start Fresh Session for Phase 2:**
-```bash
-# Terminal 1: Start server
-cd server && dart run bin/server.dart --data-dir ~/intervue_data
-
-# Terminal 2: Run Flutter web
-flutter run -d chrome
-```
 
 ---
 
@@ -179,6 +168,7 @@ flutter run -d chrome
    - `add_candidate_panel.dart` — Slide-over panel for adding candidates with resume upload
    - `status_dropdown.dart` — Status change dropdown with all statuses
    - `reject_dialog.dart` — Rejection dialog with preset reasons + custom text
+   - `settings_dialog.dart` — App settings dialog
 
 2. **Dashboard Screen** (`lib/screens/dashboard/dashboard_screen.dart`):
    - Four pipeline columns: Screening, Technical, Assignment, Final Review
@@ -195,10 +185,10 @@ flutter run -d chrome
    - Profile tab fully implemented with contact, compensation, availability, timeline
 
 4. **Tabs** (`lib/screens/candidate/tabs/`):
-   - `profile_tab.dart` — Full implementation with reject button
-   - `screening_tab.dart` — Placeholder for Phase 3
-   - `technical_tab.dart` — Placeholder for Phase 4
-   - `assignment_tab.dart` — Placeholder for Phase 5
+   - `profile_tab.dart` — Full implementation with contact, compensation, availability, timeline
+   - `screening_tab.dart` — Implemented in Phase 3
+   - `technical_tab.dart` — Implemented in Phase 4
+   - `assignment_tab.dart` — Implemented in Phase 5
 
 **Acceptance Criteria:**
 - [x] Dashboard shows sample candidates in correct pipeline columns
@@ -209,7 +199,7 @@ flutter run -d chrome
 - [x] Status changes persist across page refreshes
 - [x] Rejecting a candidate moves them to rejected pool with reason and timestamp
 
-**Known Issue (to fix):** Browser back/forward navigation — need to use `context.push()` instead of `context.go()` for proper history support. See Critical Rule #9.
+**Note:** Browser navigation uses `context.push()` for forward navigation and `context.pop()` for back, ensuring browser back/forward buttons work correctly. See Critical Rule #9.
 
 ---
 
@@ -396,48 +386,66 @@ flutter run -d chrome
 
 ---
 
-### Phase 6: Polish + Quality of Life
+## Post-Implementation Enhancements
 
-**Goal:** The app feels smooth and complete for daily use.
+Additional improvements made after Phase 5 completion:
 
-**Tasks:**
-1. Add the "Saved ✓" / "Saving..." indicator in the top bar (global)
-2. Implement keyboard shortcuts:
-   - In interview session: `1-5` keys for score, `N` to focus notes, `→` next question, `←` previous
-   - Global: `Cmd+K` or `/` for search
-   - Add a ? icon in the top corner of each page to show the list of supported shortcuts for that page
-3. Add toast notifications for actions (candidate added, status changed, email copied)
-4. Add empty states for all screens (no candidates yet, no interviews yet, etc.)
-5. Add loading states (skeleton cards on dashboard while data loads)
-6. Refine the screening email copy — support "Copy All" and "Copy Individual Question"
-7. Add candidate count badges on pipeline columns
-8. Add a "Quick Add" floating action button on dashboard
-9. Smooth all transitions and animations (page transitions, card hover states, panel slides)
-10. Test all auto-save paths — verify no data loss on browser refresh mid-interview
-11. Responsive layout: app should work at 1024px+ width. Show a "Best viewed on desktop" message below 1024px
-12. Error handling: show user-friendly error if server is not running
+**Screening Flow:**
+- Competing offers question reduced to 3 options: "No offers", "Yes, but looking for better", "Has a better offer"
+- Removed "Logistics confirmed" chips from phone screening section (Salary/Notice/On-site)
+- Auto-status updates:
+  - Copying screening email → sets status to `screening_sent`
+  - Setting grade to STRONG → moves candidate to `pending_scheduling` stage (not directly to technical)
+  - Setting grade to NO → shows rejection dialog and marks as `rejected`
 
-**Acceptance Criteria:**
-- [ ] Save indicator shows on every auto-save
-- [ ] Keyboard shortcuts work in interview session
-- [ ] Toast notifications appear for key actions
-- [ ] Empty states show helpful messages (not blank screens)
-- [ ] Loading skeletons show while data loads
-- [ ] No data loss on browser refresh during any flow
-- [ ] App is usable at 1024px width
-- [ ] Clear error message if server is unreachable
+**Pending Scheduling Status:**
+- New status `pending_scheduling` added between screening and technical stages
+- When a candidate passes screening (STRONG grade), they move to pending scheduling
+- Technical tab shows "Schedule Technical Interview" message with a "Mark as Scheduled" button
+- Once scheduled, candidate moves to `technical` status
+
+**Technical Interview:**
+- Selecting REJECT grade → marks candidate as `rejected` with reason "Failed technical interview"
+- Dashboard technical column now shows grade badge (Advance/Hold/Reject) instead of numeric score
+- Renamed "Recommendation" section to "Technical Grade" for consistency
+
+**Assignment Review:**
+- Renamed "Recommendation" section to "Assessment Grade" for consistency
+- Selecting HIRE → moves candidate to `final_review` stage
+- Selecting HOLD → keeps candidate in `assignment` stage
+- Selecting REJECT → marks candidate as `rejected` with reason "Failed assignment review"
+
+**Grading Terminology:**
+- All phases now use consistent "Grade" terminology:
+  - Screening Grade (STRONG/MAYBE/NO)
+  - Technical Grade (ADVANCE/HOLD/REJECT)
+  - Assessment Grade (HIRE/HOLD/REJECT)
+
+**Dashboard:**
+- Added refresh button to reload candidate data
+- Swimlane header accent bar colors now match status badge colors:
+  - Screening: Blue (#3498DB)
+  - Technical: Yellow (#F1C40F)
+  - Assignment: Purple (#9B59B6)
+  - Final Review: Green (#2ECC71)
+
+**UI Fixes:**
+- Fixed grade selector icons to use Material Icons with proper outlined/filled states (was using text characters that rendered inconsistently)
+- Status badge colors updated: Technical stage now uses yellow instead of orange
 
 ---
 
-## Completion Checklist
+## Verification Checklist
 
-After all phases, verify end-to-end:
+End-to-end checks:
 
 - [ ] Fresh start: delete data dir, restart server, sample data loads correctly
-- [ ] Add a new candidate → screen them → advance to technical → run interview → advance to assignment → review assignment → compare with another candidate → hire
+- [ ] Add a new candidate → screen them → mark as STRONG → verify "Pending Scheduling" status → mark as scheduled → run technical interview → advance to assignment → review assignment → compare with another candidate → hire
 - [ ] All data persists across browser refreshes at every step
 - [ ] No CORS errors in browser console
 - [ ] Timer works correctly in interview session
 - [ ] Resume PDFs open in new tab
 - [ ] Screening email copies to clipboard with correct name
 - [ ] Comparison view shows accurate scores
+- [ ] Dashboard swimlane accent colors match status badge colors (Blue/Yellow/Purple/Green)
+- [ ] All grading sections use consistent terminology (Screening Grade, Technical Grade, Assessment Grade)

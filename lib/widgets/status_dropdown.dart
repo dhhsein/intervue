@@ -61,28 +61,29 @@ class StatusDropdown extends StatelessWidget {
   }
 
   Color _getStatusColor(CandidateStatus status) {
-    // Match colors with StatusBadge
     switch (status) {
       case CandidateStatus.newCandidate:
-        return const Color(0xFFF1C40F); // Yellow
+        return AppColors.statusNew;
       case CandidateStatus.screeningSent:
-        return const Color(0xFF5DADE2); // Light blue
+        return AppColors.statusScreeningSent;
       case CandidateStatus.screeningDone:
-        return const Color(0xFF3498DB); // Blue
+        return AppColors.statusScreeningDone;
       case CandidateStatus.phoneScreen:
-        return const Color(0xFF2471A3); // Dark blue
+        return AppColors.statusPhoneScreen;
+      case CandidateStatus.pendingScheduling:
+        return AppColors.statusPendingScheduling;
       case CandidateStatus.technical:
-        return const Color(0xFFE67E22); // Orange
+        return AppColors.statusTechnical;
       case CandidateStatus.assignment:
-        return const Color(0xFF9B59B6); // Magenta
+        return AppColors.statusAssignment;
       case CandidateStatus.finalReview:
-        return const Color(0xFF00BCD4); // Cyan
+        return AppColors.statusFinalReview;
       case CandidateStatus.offer:
-        return const Color(0xFF2ECC71); // Green
+        return AppColors.statusOffer;
       case CandidateStatus.hired:
-        return const Color(0xFFE8E8E8); // White
+        return AppColors.statusHired;
       case CandidateStatus.rejected:
-        return const Color(0xFFE74C3C); // Red
+        return AppColors.statusRejected;
     }
   }
 }

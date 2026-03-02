@@ -8,13 +8,15 @@ import '../theme/app_typography.dart';
 class GradeOption {
   final String value;
   final String label;
-  final String icon;
+  final IconData icon;
+  final IconData iconOutlined;
   final Color color;
 
   const GradeOption({
     required this.value,
     required this.label,
     required this.icon,
+    required this.iconOutlined,
     required this.color,
   });
 }
@@ -37,66 +39,81 @@ class GradeSelector extends StatelessWidget {
     GradeOption(
       value: 'strong',
       label: 'STRONG',
-      icon: '★',
+      icon: Icons.star,
+      iconOutlined: Icons.star_outline,
       color: AppColors.success,
     ),
     GradeOption(
       value: 'maybe',
       label: 'MAYBE',
-      icon: '○',
+      icon: Icons.help,
+      iconOutlined: Icons.help_outline,
       color: AppColors.warning,
     ),
     GradeOption(
       value: 'no',
       label: 'NO',
-      icon: '✕',
+      icon: Icons.cancel,
+      iconOutlined: Icons.cancel_outlined,
       color: AppColors.error,
     ),
   ];
 
-  /// Pre-built recommendation options.
-  static const recommendationOptions = [
+  /// Pre-built technical grade options (ADVANCE/HOLD/REJECT).
+  static const technicalGradeOptions = [
     GradeOption(
       value: 'advance',
       label: 'ADVANCE',
-      icon: '▶',
+      icon: Icons.check_circle,
+      iconOutlined: Icons.check_circle_outline,
       color: AppColors.success,
     ),
     GradeOption(
       value: 'hold',
       label: 'HOLD',
-      icon: '⏸',
+      icon: Icons.pause_circle_filled,
+      iconOutlined: Icons.pause_circle_outline,
       color: AppColors.warning,
     ),
     GradeOption(
       value: 'reject',
       label: 'REJECT',
-      icon: '✕',
+      icon: Icons.cancel,
+      iconOutlined: Icons.cancel_outlined,
       color: AppColors.error,
     ),
   ];
 
-  /// Pre-built hire options.
-  static const hireOptions = [
+  /// Alias for backwards compatibility.
+  static const recommendationOptions = technicalGradeOptions;
+
+  /// Pre-built assessment grade options (HIRE/HOLD/REJECT).
+  static const assessmentGradeOptions = [
     GradeOption(
       value: 'hire',
       label: 'HIRE',
-      icon: '✓',
+      icon: Icons.check_circle,
+      iconOutlined: Icons.check_circle_outline,
       color: AppColors.success,
     ),
     GradeOption(
       value: 'hold',
       label: 'HOLD',
-      icon: '⏸',
+      icon: Icons.pause_circle_filled,
+      iconOutlined: Icons.pause_circle_outline,
       color: AppColors.warning,
     ),
     GradeOption(
       value: 'reject',
       label: 'REJECT',
-      icon: '✕',
+      icon: Icons.cancel,
+      iconOutlined: Icons.cancel_outlined,
       color: AppColors.error,
     ),
   ];
+
+  /// Alias for backwards compatibility.
+  static const hireOptions = assessmentGradeOptions;
 
   @override
   Widget build(BuildContext context) {
@@ -166,14 +183,14 @@ class _GradeCardState extends State<_GradeCard> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                widget.option.icon,
-                style: TextStyle(
-                  fontSize: 24,
-                  color: widget.isSelected
-                      ? widget.option.color
-                      : AppColors.textTertiary,
-                ),
+              Icon(
+                widget.isSelected
+                    ? widget.option.icon
+                    : widget.option.iconOutlined,
+                size: 24,
+                color: widget.isSelected
+                    ? widget.option.color
+                    : AppColors.textTertiary,
               ),
               const SizedBox(height: 4),
               Text(

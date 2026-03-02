@@ -152,12 +152,15 @@ Future<Response> _getCandidates(Request request) async {
             screeningGrade = data['screening']['grade'];
           }
 
+          String? technicalRecommendation;
           final technicalFile = File(path.join(entity.path, 'technical.json'));
           if (await technicalFile.exists()) {
             final techData = jsonDecode(await technicalFile.readAsString());
             technicalScore = _calculateTechnicalScore(techData);
+            technicalRecommendation = techData['recommendation'];
           } else if (data['technical'] != null) {
             technicalScore = _calculateTechnicalScore(data['technical']);
+            technicalRecommendation = data['technical']['recommendation'];
           }
 
           final assignmentFile = File(path.join(entity.path, 'assignment.json'));
@@ -172,6 +175,7 @@ Future<Response> _getCandidates(Request request) async {
             ...candidate,
             'screeningGrade': screeningGrade,
             'technicalScore': technicalScore,
+            'technicalRecommendation': technicalRecommendation,
             'assignmentScore': assignmentScore,
           });
         }

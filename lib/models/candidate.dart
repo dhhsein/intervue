@@ -24,6 +24,8 @@ class Candidate {
   @JsonKey(includeFromJson: true, includeToJson: false)
   double? technicalScore;
   @JsonKey(includeFromJson: true, includeToJson: false)
+  String? technicalRecommendation;
+  @JsonKey(includeFromJson: true, includeToJson: false)
   double? assignmentScore;
 
   Candidate({
@@ -39,6 +41,7 @@ class Candidate {
     this.timeline = const [],
     this.screeningGrade,
     this.technicalScore,
+    this.technicalRecommendation,
     this.assignmentScore,
   });
 
@@ -57,6 +60,8 @@ enum CandidateStatus {
   screeningDone('screening_done'),
   @JsonValue('phone_screen')
   phoneScreen('phone_screen'),
+  @JsonValue('pending_scheduling')
+  pendingScheduling('pending_scheduling'),
   @JsonValue('technical')
   technical('technical'),
   @JsonValue('assignment')
@@ -83,6 +88,8 @@ enum CandidateStatus {
         return 'Screening Done';
       case CandidateStatus.phoneScreen:
         return 'Phone Screen';
+      case CandidateStatus.pendingScheduling:
+        return 'Pending Scheduling';
       case CandidateStatus.technical:
         return 'Technical';
       case CandidateStatus.assignment:
@@ -105,6 +112,7 @@ enum CandidateStatus {
       case CandidateStatus.screeningDone:
       case CandidateStatus.phoneScreen:
         return PipelineStage.screening;
+      case CandidateStatus.pendingScheduling:
       case CandidateStatus.technical:
         return PipelineStage.technical;
       case CandidateStatus.assignment:

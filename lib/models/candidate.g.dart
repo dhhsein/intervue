@@ -25,6 +25,7 @@ Candidate _$CandidateFromJson(Map<String, dynamic> json) => Candidate(
       const [],
   screeningGrade: json['screeningGrade'] as String?,
   technicalScore: (json['technicalScore'] as num?)?.toDouble(),
+  technicalRecommendation: json['technicalRecommendation'] as String?,
   assignmentScore: (json['assignmentScore'] as num?)?.toDouble(),
 );
 
@@ -46,6 +47,7 @@ const _$CandidateStatusEnumMap = {
   CandidateStatus.screeningSent: 'screening_sent',
   CandidateStatus.screeningDone: 'screening_done',
   CandidateStatus.phoneScreen: 'phone_screen',
+  CandidateStatus.pendingScheduling: 'pending_scheduling',
   CandidateStatus.technical: 'technical',
   CandidateStatus.assignment: 'assignment',
   CandidateStatus.finalReview: 'final_review',

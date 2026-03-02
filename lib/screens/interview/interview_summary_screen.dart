@@ -560,11 +560,11 @@ class _InterviewSummaryScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Recommendation'),
+        _buildSectionHeader('Technical Grade'),
         const SizedBox(height: AppSpacing.md),
         GradeSelector(
           value: _recommendation,
-          options: GradeSelector.recommendationOptions,
+          options: GradeSelector.technicalGradeOptions,
           onChanged: (value) => setState(() => _recommendation = value),
         ),
       ],
@@ -617,6 +617,14 @@ class _InterviewSummaryScreenState
       // Clear the interview session
       ref.read(interviewProvider.notifier).endInterview();
       ref.read(selectedQuestionsProvider.notifier).state = {};
+
+      // Update candidate status based on recommendation
+      if (_recommendation == 'reject') {
+        await dataService.updateCandidate(widget.candidateId, {
+          'status': 'rejected',
+          'rejectionReason': 'Failed technical interview',
+        });
+      }
 
       // Invalidate candidate detail to refresh
       ref.invalidate(candidateDetailProvider(widget.candidateId));

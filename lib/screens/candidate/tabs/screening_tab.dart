@@ -16,6 +16,7 @@ import '../../../widgets/auto_save_text_field.dart';
 import '../../../widgets/grade_selector.dart';
 import '../../../widgets/multi_select_chips.dart';
 import '../../../widgets/number_input.dart';
+import '../../../widgets/reject_dialog.dart';
 import '../../../widgets/score_selector.dart';
 import '../../../widgets/tech_level_matrix.dart';
 import '../../../widgets/toggle_chips.dart';
@@ -225,6 +226,12 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
 
     // Mark email as sent
     ref.read(screeningNotifierProvider(widget.candidateId).notifier).markEmailSent();
+
+    // Update candidate status to screening_sent
+    await ref.read(candidatesProvider.notifier).updateCandidate(
+      widget.candidateId,
+      {'status': 'screening_sent'},
+    );
 
     _showToast('Screening email copied to clipboard');
   }
@@ -461,6 +468,51 @@ Best,
         .updateResponse(questionId, response);
   }
 
+  Future<void> _handleGradeChange(String? value) async {
+    final grade = value == null
+        ? null
+        : ScreeningGrade.values.firstWhere((g) => g.value == value);
+
+    // Update the grade
+    ref.read(screeningNotifierProvider(widget.candidateId).notifier).updateGrade(grade);
+
+    // Handle status changes based on grade
+    if (grade == ScreeningGrade.strong) {
+      // Strong → move to pending scheduling
+      await ref.read(candidatesProvider.notifier).updateCandidate(
+        widget.candidateId,
+        {'status': 'pending_scheduling'},
+      );
+      _showToast('Candidate moved to Pending Scheduling');
+    } else if (grade == ScreeningGrade.no) {
+      // No → show reject dialog
+      final candidateAsync = ref.read(candidateDetailProvider(widget.candidateId));
+      final candidateName = candidateAsync.valueOrNull?.candidate.name ?? 'Candidate';
+
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => RejectDialog(
+            candidateName: candidateName,
+            onReject: (reason) async {
+              await ref.read(candidatesProvider.notifier).updateCandidate(
+                widget.candidateId,
+                {
+                  'status': 'rejected',
+                  'rejectionReason': reason,
+                },
+              );
+              if (mounted) {
+                _showToast('Candidate rejected');
+              }
+            },
+          ),
+        );
+      }
+    }
+    // Maybe → stay in screening, no status change needed
+  }
+
   Widget _buildGradeSection(ScreeningData screening) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,14 +539,7 @@ Best,
         GradeSelector(
           value: screening.grade?.value,
           options: GradeSelector.screeningGradeOptions,
-          onChanged: (value) {
-            final grade = value == null
-                ? null
-                : ScreeningGrade.values.firstWhere((g) => g.value == value);
-            ref
-                .read(screeningNotifierProvider(widget.candidateId).notifier)
-                .updateGrade(grade);
-          },
+          onChanged: (value) => _handleGradeChange(value),
         ),
       ],
     );
@@ -579,39 +624,6 @@ Best,
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                Text(
-                  'Logistics confirmed:',
-                  style: AppTypography.bodyMedium,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: AppSpacing.md,
-                  runSpacing: AppSpacing.sm,
-                  children: [
-                    _buildConfirmChip(
-                      'Salary',
-                      phoneScreen.salaryConfirmed,
-                      (value) => _updatePhoneScreen(
-                        phoneScreen.copyWith(salaryConfirmed: value),
-                      ),
-                    ),
-                    _buildConfirmChip(
-                      'Notice',
-                      phoneScreen.noticeConfirmed,
-                      (value) => _updatePhoneScreen(
-                        phoneScreen.copyWith(noticeConfirmed: value),
-                      ),
-                    ),
-                    _buildConfirmChip(
-                      'On-site',
-                      phoneScreen.onsiteConfirmed,
-                      (value) => _updatePhoneScreen(
-                        phoneScreen.copyWith(onsiteConfirmed: value),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
                 AutoSaveTextField(
                   initialValue: phoneScreen.notes,
                   hint: 'Phone screen notes...',
@@ -627,38 +639,6 @@ Best,
           ),
         ],
       ],
-    );
-  }
-
-  Widget _buildConfirmChip(String label, bool isConfirmed, ValueChanged<bool> onChanged) {
-    return GestureDetector(
-      onTap: () => onChanged(!isConfirmed),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isConfirmed ? AppColors.success.withValues(alpha: 0.2) : AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isConfirmed ? AppColors.success : AppColors.surfaceBorder,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isConfirmed)
-              const Padding(
-                padding: EdgeInsets.only(right: 4),
-                child: Icon(Icons.check, size: 14, color: AppColors.success),
-              ),
-            Text(
-              label,
-              style: AppTypography.bodySmall.copyWith(
-                color: isConfirmed ? AppColors.success : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../models/candidate.dart';
 import '../../../models/technical_round.dart';
 import '../../../providers/candidates_provider.dart';
 import '../../../providers/questions_provider.dart';
@@ -23,12 +24,73 @@ class TechnicalTab extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => Center(child: Text('Error: $err')),
       data: (detail) {
+        // Check if candidate is in pending scheduling state
+        if (detail.candidate.status == CandidateStatus.pendingScheduling) {
+          return _buildPendingSchedulingState(context, ref);
+        }
+
         final technical = detail.technical;
         if (technical == null || !technical.completed) {
           return _buildNoInterviewState(context);
         }
         return _buildInterviewResults(context, ref, technical);
       },
+    );
+  }
+
+  Widget _buildPendingSchedulingState(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.calendar_month_outlined,
+            size: 64,
+            color: AppColors.statusPendingScheduling,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            'Schedule Technical Interview',
+            style: AppTypography.titleSmall,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'This candidate passed screening and is ready for a technical interview.',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Schedule a call with the candidate to proceed.',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          ElevatedButton.icon(
+            onPressed: () async {
+              // Mark as ready for technical interview
+              await ref.read(candidatesProvider.notifier).updateCandidate(
+                candidateId,
+                {'status': 'technical'},
+              );
+            },
+            icon: const Icon(Icons.check),
+            label: const Text('Mark as Scheduled'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.statusPendingScheduling,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

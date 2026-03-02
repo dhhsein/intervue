@@ -48,4 +48,35 @@ class AppColors {
         return textTertiary;
     }
   }
+
+  // ============================================
+  // Status Colors
+  // ============================================
+
+  // Screening stage colors (blue progression)
+  static const Color statusNew = Color(0xFFF1C40F);           // Yellow
+  static const Color statusScreeningSent = Color(0xFF5DADE2); // Light blue
+  static const Color statusScreeningDone = Color(0xFF3498DB); // Blue
+  static const Color statusPhoneScreen = Color(0xFF2471A3);   // Dark blue
+
+  // Technical stage colors
+  static const Color statusPendingScheduling = Color(0xFFF39C12); // Orange
+  static const Color statusTechnical = Color(0xFFF1C40F);         // Yellow
+
+  // Assignment stage color
+  static const Color statusAssignment = Color(0xFF9B59B6);    // Purple
+
+  // Final stage colors
+  static const Color statusFinalReview = Color(0xFF00BCD4);   // Cyan
+  static const Color statusOffer = Color(0xFF2ECC71);         // Green
+  static const Color statusHired = Color(0xFFE8E8E8);         // White
+  static const Color statusRejected = Color(0xFFE74C3C);      // Red
+
+  // ============================================
+  // Pipeline Stage Colors (for swimlane headers)
+  // ============================================
+  static const Color stageScreening = Color(0xFF3498DB);   // Blue
+  static const Color stageTechnical = Color(0xFFF1C40F);   // Yellow
+  static const Color stageAssignment = Color(0xFF9B59B6);  // Purple
+  static const Color stageFinalReview = Color(0xFF2ECC71); // Green
 }

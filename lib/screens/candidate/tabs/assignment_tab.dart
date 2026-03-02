@@ -942,7 +942,7 @@ Best,
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('Recommendation'),
+        _buildSectionHeader('Assessment Grade'),
         const SizedBox(height: AppSpacing.md),
         Container(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -962,9 +962,28 @@ Best,
               const SizedBox(height: AppSpacing.md),
               GradeSelector(
                 value: assignment.recommendation,
-                options: GradeSelector.hireOptions,
-                onChanged: (value) {
+                options: GradeSelector.assessmentGradeOptions,
+                onChanged: (value) async {
                   notifier.updateRecommendation(value);
+
+                  // Update candidate status based on grade
+                  if (value == 'hire') {
+                    // Hire → move to final review
+                    await ref.read(candidatesProvider.notifier).updateCandidate(
+                      candidateId,
+                      {'status': 'final_review'},
+                    );
+                  } else if (value == 'reject') {
+                    // Reject → mark as rejected
+                    await ref.read(candidatesProvider.notifier).updateCandidate(
+                      candidateId,
+                      {
+                        'status': 'rejected',
+                        'rejectionReason': 'Failed assignment review',
+                      },
+                    );
+                  }
+                  // Hold → stay in assignment, no status change needed
                 },
               ),
             ],
