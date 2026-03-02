@@ -76,7 +76,7 @@ class _InterviewSessionScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.warning, size: 48, color: AppColors.warning),
+              const Icon(Icons.warning, size: 48, color: AppColors.warning),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'No active interview session',
@@ -152,7 +152,7 @@ class _InterviewSessionScreenState
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.surfaceBorder)),
       ),
@@ -172,7 +172,7 @@ class _InterviewSessionScreenState
             ),
             child: Row(
               children: [
-                Icon(Icons.timer, size: 16, color: AppColors.accent),
+                const Icon(Icons.timer, size: 16, color: AppColors.accent),
                 const SizedBox(width: 6),
                 Text(
                   _formatDuration(_elapsed),
@@ -534,7 +534,7 @@ class _InterviewSessionScreenState
   Widget _buildBottomBar(InterviewSession session) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.surfaceBorder)),
       ),
@@ -552,7 +552,7 @@ class _InterviewSessionScreenState
             label: const Text('Previous'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: BorderSide(color: AppColors.surfaceBorder),
+              side: const BorderSide(color: AppColors.surfaceBorder),
             ),
           ),
           TextButton(
@@ -560,7 +560,7 @@ class _InterviewSessionScreenState
               setState(() => _showFraudProbe = false);
               ref.read(interviewProvider.notifier).skipCurrentQuestion();
             },
-            child: Text(
+            child: const Text(
               'Skip',
               style: TextStyle(color: AppColors.textSecondary),
             ),
@@ -576,7 +576,7 @@ class _InterviewSessionScreenState
             label: const Text('Next'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: BorderSide(color: AppColors.surfaceBorder),
+              side: const BorderSide(color: AppColors.surfaceBorder),
             ),
           ),
         ],

@@ -153,7 +153,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(color: AppColors.surfaceBorder),
         ),
@@ -295,7 +295,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
                   ),
                 ),
                 if (_selectedFileName != null)
-                  Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                  const Icon(Icons.check_circle, color: AppColors.success, size: 20),
               ],
             ),
           ),
@@ -307,7 +307,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(color: AppColors.surfaceBorder),
         ),

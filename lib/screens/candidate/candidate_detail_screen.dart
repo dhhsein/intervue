@@ -68,7 +68,7 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: AppSpacing.md),
           Text(
             'Failed to load candidate',
@@ -119,7 +119,7 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           bottom: BorderSide(color: AppColors.surfaceBorder),
@@ -247,7 +247,7 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
               ),
             ),
             const SizedBox(width: 4),
-            Icon(Icons.copy, size: 12, color: AppColors.textTertiary),
+            const Icon(Icons.copy, size: 12, color: AppColors.textTertiary),
           ],
         ),
       ),
@@ -256,7 +256,7 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
 
   Widget _buildTabs() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           bottom: BorderSide(color: AppColors.surfaceBorder),

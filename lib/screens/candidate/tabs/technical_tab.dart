@@ -37,7 +37,7 @@ class TechnicalTab extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.videocam_outlined,
             size: 64,
             color: AppColors.textTertiary,
@@ -147,7 +147,7 @@ class TechnicalTab extends ConsumerWidget {
                   label: const Text('Run Another Interview'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
-                    side: BorderSide(color: AppColors.surfaceBorder),
+                    side: const BorderSide(color: AppColors.surfaceBorder),
                   ),
                 ),
               ),
@@ -347,7 +347,7 @@ class TechnicalTab extends ConsumerWidget {
       return Container(
         width: 28,
         height: 28,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.surfaceLight,
           shape: BoxShape.circle,
         ),

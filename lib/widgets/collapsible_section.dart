@@ -83,7 +83,7 @@ class _CollapsibleSectionState extends State<CollapsibleSection>
               children: [
                 RotationTransition(
                   turns: _iconTurns,
-                  child: Icon(
+                  child: const Icon(
                     Icons.expand_more,
                     color: AppColors.textSecondary,
                     size: 20,

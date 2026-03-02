@@ -27,7 +27,7 @@ class SaveIndicator extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           key: const ValueKey('saving'),
           children: [
-            SizedBox(
+            const SizedBox(
               width: 12,
               height: 12,
               child: CircularProgressIndicator(
@@ -49,7 +49,7 @@ class SaveIndicator extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           key: const ValueKey('saved'),
           children: [
-            Icon(Icons.check, size: 14, color: AppColors.textTertiary),
+            const Icon(Icons.check, size: 14, color: AppColors.textTertiary),
             const SizedBox(width: 4),
             Text(
               'Saved',
@@ -64,7 +64,7 @@ class SaveIndicator extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           key: const ValueKey('error'),
           children: [
-            Icon(Icons.error_outline, size: 14, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 14, color: AppColors.error),
             const SizedBox(width: 4),
             Text(
               'Save failed',
@@ -77,7 +77,7 @@ class SaveIndicator extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           key: const ValueKey('offline'),
           children: [
-            Icon(Icons.cloud_off, size: 14, color: AppColors.error),
+            const Icon(Icons.cloud_off, size: 14, color: AppColors.error),
             const SizedBox(width: 4),
             Text(
               'Server offline',

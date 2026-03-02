@@ -15,7 +15,7 @@ class AssignmentTab extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.assignment_outlined,
             size: 48,
             color: AppColors.textTertiary,

@@ -29,7 +29,7 @@ class AppSearchBar extends StatelessWidget {
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.textTertiary,
           ),
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search,
             color: AppColors.textTertiary,
             size: 20,
@@ -42,7 +42,7 @@ class AppSearchBar extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColors.accent, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),

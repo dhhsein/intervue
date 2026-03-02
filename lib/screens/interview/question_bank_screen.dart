@@ -72,7 +72,7 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           bottom: BorderSide(color: AppColors.surfaceBorder),
@@ -173,7 +173,7 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.search_off,
               size: 48,
               color: AppColors.textTertiary,
@@ -354,7 +354,7 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           top: BorderSide(color: AppColors.surfaceBorder),

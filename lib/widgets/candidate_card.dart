@@ -160,7 +160,7 @@ class _CandidateCardState extends State<CandidateCard> {
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(Icons.check, size: 14, color: AppColors.success),
+              const Icon(Icons.check, size: 14, color: AppColors.success),
             ],
           )
         else
@@ -195,7 +195,7 @@ class _CandidateCardState extends State<CandidateCard> {
   Widget _buildHiredContent(Candidate candidate) {
     return Row(
       children: [
-        Icon(Icons.celebration, size: 14, color: AppColors.success),
+        const Icon(Icons.celebration, size: 14, color: AppColors.success),
         const SizedBox(width: 4),
         Text(
           'Hired',

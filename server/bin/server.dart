@@ -57,7 +57,9 @@ void main(List<String> args) async {
       .addHandler(app.call);
 
   final server = await shelf_io.serve(handler, InternetAddress.anyIPv4, port);
+  // ignore: avoid_print
   print('InterVue server running on http://localhost:${server.port}');
+  // ignore: avoid_print
   print('Data directory: $dataDir');
 }
 
@@ -89,6 +91,7 @@ Future<void> initializeDataDir() async {
       (await dir.list().isEmpty);
 
   if (isEmpty) {
+    // ignore: avoid_print
     print('Initializing data directory with sample data...');
 
     await dir.create(recursive: true);
@@ -97,12 +100,14 @@ Future<void> initializeDataDir() async {
 
     await _copyDirectory(Directory(sampleDataDir), dir);
 
+    // ignore: avoid_print
     print('Initialized data directory with sample data at $dataDir');
   }
 }
 
 Future<void> _copyDirectory(Directory source, Directory destination) async {
   if (!await source.exists()) {
+    // ignore: avoid_print
     print('Warning: Sample data directory not found at ${source.path}');
     return;
   }
@@ -207,7 +212,7 @@ double? _calculateAssignmentScore(Map<String, dynamic>? data) {
     final weight = entry['weight'];
     if (score != null && weight != null) {
       total += (score as num).toDouble() * ((weight as num).toDouble() / 100);
-      weightSum += (weight as num).toDouble() / 100;
+      weightSum += (weight).toDouble() / 100;
     }
   }
 

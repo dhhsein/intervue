@@ -45,7 +45,7 @@ class _InterviewSummaryScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.warning, size: 48, color: AppColors.warning),
+              const Icon(Icons.warning, size: 48, color: AppColors.warning),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'No active interview session',
@@ -106,7 +106,7 @@ class _InterviewSummaryScreenState
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           bottom: BorderSide(color: AppColors.surfaceBorder),
@@ -242,7 +242,7 @@ class _InterviewSummaryScreenState
       return Container(
         width: 28,
         height: 28,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.surfaceLight,
           shape: BoxShape.circle,
         ),

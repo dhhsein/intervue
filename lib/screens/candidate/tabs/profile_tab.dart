@@ -117,7 +117,7 @@ class ProfileTab extends ConsumerWidget {
           child: _buildCompensationCard('Current CTC', '₹$currentCtc LPA'),
         ),
         const SizedBox(width: AppSpacing.md),
-        Icon(Icons.arrow_forward, color: AppColors.textTertiary),
+        const Icon(Icons.arrow_forward, color: AppColors.textTertiary),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: _buildCompensationCard('Expected CTC', '₹$expectedCtc LPA'),
@@ -239,7 +239,7 @@ class ProfileTab extends ConsumerWidget {
               Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.surfaceLight,
                   shape: BoxShape.circle,
                 ),
