@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/candidate.dart';
 import '../models/screening_data.dart';
@@ -52,7 +53,7 @@ class _CandidateCardState extends State<CandidateCard> {
 
   Widget _buildContent() {
     final candidate = widget.candidate;
-    final stage = candidate.status.pipelineStage;
+    final stage = candidate.effectivePipelineStage;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +75,8 @@ class _CandidateCardState extends State<CandidateCard> {
     switch (stage) {
       case PipelineStage.screening:
         return _buildScreeningContent(candidate);
+      case PipelineStage.scheduled:
+        return _buildScheduledContent(candidate);
       case PipelineStage.technical:
         return _buildTechnicalContent(candidate);
       case PipelineStage.assignment:
@@ -85,6 +88,31 @@ class _CandidateCardState extends State<CandidateCard> {
       case PipelineStage.rejected:
         return _buildRejectedContent(candidate);
     }
+  }
+
+  Widget _buildScheduledContent(Candidate candidate) {
+    final meetingTime = candidate.scheduledMeetingTime;
+    if (meetingTime == null) {
+      return Text('No meeting scheduled', style: AppTypography.bodySmall);
+    }
+
+    final dateFormat = DateFormat('d MMM, h:mm a');
+    return Row(
+      children: [
+        const Icon(
+          Icons.videocam,
+          size: 14,
+          color: AppColors.stageScheduled,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          dateFormat.format(meetingTime),
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.stageScheduled,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildScreeningContent(Candidate candidate) {

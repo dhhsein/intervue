@@ -18,6 +18,11 @@ class Candidate {
   String? rejectionReason;
   List<StatusChange> timeline;
 
+  // Meeting scheduling fields
+  DateTime? scheduledMeetingTime;
+  int? meetingDurationMinutes;
+  String? meetingLink;
+
   // Computed fields from related data (populated by API)
   @JsonKey(includeFromJson: true, includeToJson: false)
   String? screeningGrade;
@@ -39,6 +44,9 @@ class Candidate {
     required this.updatedAt,
     this.rejectionReason,
     this.timeline = const [],
+    this.scheduledMeetingTime,
+    this.meetingDurationMinutes,
+    this.meetingLink,
     this.screeningGrade,
     this.technicalScore,
     this.technicalRecommendation,
@@ -48,6 +56,20 @@ class Candidate {
   factory Candidate.fromJson(Map<String, dynamic> json) =>
       _$CandidateFromJson(json);
   Map<String, dynamic> toJson() => _$CandidateToJson(this);
+
+  /// Returns the effective pipeline stage, considering scheduled meetings.
+  /// Candidates with a scheduled meeting time (and in technical status without
+  /// a completed interview) appear in the "scheduled" stage.
+  PipelineStage get effectivePipelineStage {
+    // If candidate has a scheduled meeting and is in technical status,
+    // but hasn't completed the technical interview yet, show in scheduled column
+    if (scheduledMeetingTime != null &&
+        status == CandidateStatus.technical &&
+        technicalScore == null) {
+      return PipelineStage.scheduled;
+    }
+    return status.pipelineStage;
+  }
 }
 
 @JsonEnum(valueField: 'value')
@@ -128,7 +150,7 @@ enum CandidateStatus {
   }
 }
 
-enum PipelineStage { screening, technical, assignment, finalReview, hired, rejected }
+enum PipelineStage { screening, scheduled, technical, assignment, finalReview, hired, rejected }
 
 @JsonSerializable()
 class StatusChange {

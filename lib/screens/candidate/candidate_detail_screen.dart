@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/candidate.dart';
@@ -194,19 +195,92 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
           ),
           const SaveIndicator(),
           const SizedBox(width: AppSpacing.lg),
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                'Status: ',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Status: ',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  StatusDropdown(
+                    value: candidate.status,
+                    onChanged: (newStatus) => _updateStatus(candidate, newStatus),
+                  ),
+                ],
               ),
-              StatusDropdown(
-                value: candidate.status,
-                onChanged: (newStatus) => _updateStatus(candidate, newStatus),
-              ),
+              if (candidate.meetingLink != null && candidate.scheduledMeetingTime != null)
+                _buildMeetingInfo(candidate),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMeetingInfo(Candidate candidate) {
+    final dateFormat = DateFormat('EEE, MMM d');
+    final timeFormat = DateFormat('h:mm a');
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.videocam,
+            size: 16,
+            color: AppColors.accent,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${dateFormat.format(candidate.scheduledMeetingTime!)} at ${timeFormat.format(candidate.scheduledMeetingTime!)}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          InkWell(
+            onTap: () async {
+              await Clipboard.setData(ClipboardData(text: candidate.meetingLink!));
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Meeting link copied to clipboard'),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Copy Link',
+                    style: AppTypography.label.copyWith(
+                      color: AppColors.accent,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.copy,
+                    size: 12,
+                    color: AppColors.accent,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

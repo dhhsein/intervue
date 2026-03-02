@@ -183,16 +183,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildPipelineView(List<Candidate> candidates) {
     final screening = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.screening)
+        .where((c) => c.effectivePipelineStage == PipelineStage.screening)
         .toList();
+    final scheduled = candidates
+        .where((c) => c.effectivePipelineStage == PipelineStage.scheduled)
+        .toList()
+      ..sort((a, b) => (a.scheduledMeetingTime ?? DateTime.now())
+          .compareTo(b.scheduledMeetingTime ?? DateTime.now()));
     final technical = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.technical)
+        .where((c) => c.effectivePipelineStage == PipelineStage.technical)
         .toList();
     final assignment = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.assignment)
+        .where((c) => c.effectivePipelineStage == PipelineStage.assignment)
         .toList();
     final finalReview = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.finalReview)
+        .where((c) => c.effectivePipelineStage == PipelineStage.finalReview)
         .toList();
 
     return Padding(
@@ -206,6 +211,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               candidates: screening,
               onCandidateTap: _navigateToCandidate,
               accentColor: AppColors.stageScreening,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: PipelineColumn(
+              title: 'Scheduled',
+              candidates: scheduled,
+              onCandidateTap: _navigateToCandidate,
+              accentColor: AppColors.stageScheduled,
             ),
           ),
           const SizedBox(width: AppSpacing.md),

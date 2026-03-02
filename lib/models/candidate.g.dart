@@ -23,6 +23,11 @@ Candidate _$CandidateFromJson(Map<String, dynamic> json) => Candidate(
           ?.map((e) => StatusChange.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  scheduledMeetingTime: json['scheduledMeetingTime'] == null
+      ? null
+      : DateTime.parse(json['scheduledMeetingTime'] as String),
+  meetingDurationMinutes: (json['meetingDurationMinutes'] as num?)?.toInt(),
+  meetingLink: json['meetingLink'] as String?,
   screeningGrade: json['screeningGrade'] as String?,
   technicalScore: (json['technicalScore'] as num?)?.toDouble(),
   technicalRecommendation: json['technicalRecommendation'] as String?,
@@ -40,6 +45,9 @@ Map<String, dynamic> _$CandidateToJson(Candidate instance) => <String, dynamic>{
   'updatedAt': instance.updatedAt.toIso8601String(),
   'rejectionReason': instance.rejectionReason,
   'timeline': instance.timeline,
+  'scheduledMeetingTime': instance.scheduledMeetingTime?.toIso8601String(),
+  'meetingDurationMinutes': instance.meetingDurationMinutes,
+  'meetingLink': instance.meetingLink,
 };
 
 const _$CandidateStatusEnumMap = {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -10,15 +11,60 @@ import '../../../providers/questions_provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
+import '../../../utils/meeting_info_parser.dart';
 
-class TechnicalTab extends ConsumerWidget {
+class TechnicalTab extends ConsumerStatefulWidget {
   final String candidateId;
 
   const TechnicalTab({super.key, required this.candidateId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(candidateDetailProvider(candidateId));
+  ConsumerState<TechnicalTab> createState() => _TechnicalTabState();
+}
+
+class _TechnicalTabState extends ConsumerState<TechnicalTab> {
+  final _inviteController = TextEditingController();
+  MeetingInfoParser? _parsedInfo;
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _inviteController.dispose();
+    super.dispose();
+  }
+
+  void _parseInviteText(String text) {
+    setState(() {
+      _parsedInfo = MeetingInfoParser.parse(text);
+    });
+  }
+
+  Future<void> _saveMeetingInfo() async {
+    if (_parsedInfo == null || !_parsedInfo!.isValid) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      await ref.read(candidatesProvider.notifier).updateCandidate(
+        widget.candidateId,
+        {
+          'status': 'technical',
+          'scheduledMeetingTime': _parsedInfo!.meetingTime!.toIso8601String(),
+          'meetingDurationMinutes': _parsedInfo!.durationMinutes,
+          'meetingLink': _parsedInfo!.meetingLink,
+        },
+      );
+      ref.invalidate(candidateDetailProvider(widget.candidateId));
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final detailAsync = ref.watch(candidateDetailProvider(widget.candidateId));
 
     return detailAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -26,7 +72,7 @@ class TechnicalTab extends ConsumerWidget {
       data: (detail) {
         // Check if candidate is in pending scheduling state
         if (detail.candidate.status == CandidateStatus.pendingScheduling) {
-          return _buildPendingSchedulingState(context, ref);
+          return _buildPendingSchedulingState(context, detail.candidate.name);
         }
 
         final technical = detail.technical;
@@ -38,59 +84,324 @@ class TechnicalTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildPendingSchedulingState(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.calendar_month_outlined,
-            size: 64,
-            color: AppColors.statusPendingScheduling,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'Schedule Technical Interview',
-            style: AppTypography.titleSmall,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'This candidate passed screening and is ready for a technical interview.',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            'Schedule a call with the candidate to proceed.',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          ElevatedButton.icon(
-            onPressed: () async {
-              // Mark as ready for technical interview
-              await ref.read(candidatesProvider.notifier).updateCandidate(
-                candidateId,
-                {'status': 'technical'},
-              );
-            },
-            icon: const Icon(Icons.check),
-            label: const Text('Mark as Scheduled'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.statusPendingScheduling,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
+  Widget _buildPendingSchedulingState(BuildContext context, String candidateName) {
+    final meetingTitle = '$candidateName | Technical Interview | Acrophase, IITMadras';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Meeting info input section
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.surfaceBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Copyable meeting title
+                    InkWell(
+                      onTap: () async {
+                        await Clipboard.setData(ClipboardData(text: meetingTitle));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Meeting title copied to clipboard'),
+                              behavior: SnackBarBehavior.floating,
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.accent.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                meetingTitle,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.accent,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            const Icon(
+                              Icons.copy,
+                              size: 18,
+                              color: AppColors.accent,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.event,
+                          color: AppColors.accent,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Paste Google Meet Invite',
+                          style: AppTypography.titleSmall,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    TextField(
+                      controller: _inviteController,
+                      maxLines: 6,
+                      decoration: InputDecoration(
+                        hintText: 'Paste the Google Calendar invite text here...',
+                        hintStyle: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textTertiary,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.background,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.surfaceBorder),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.accent),
+                        ),
+                      ),
+                      style: AppTypography.bodyMedium,
+                      onChanged: _parseInviteText,
+                    ),
+                    if (_parsedInfo != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _buildParsedInfoDisplay(),
+                    ],
+                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _parsedInfo?.isValid == true && !_isSaving
+                            ? _saveMeetingInfo
+                            : null,
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.check),
+                        label: Text(_isSaving ? 'Saving...' : 'Save & Continue'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.accent,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: AppColors.surfaceLight,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              const SizedBox(height: AppSpacing.xl),
+              // Divider with "OR" text
+              Row(
+                children: [
+                  Expanded(child: Container(height: 1, color: AppColors.surfaceBorder)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Text(
+                      'OR',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ),
+                  Expanded(child: Container(height: 1, color: AppColors.surfaceBorder)),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              // Original content
+              const Icon(
+                Icons.calendar_month_outlined,
+                size: 64,
+                color: AppColors.statusPendingScheduling,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Schedule Technical Interview',
+                style: AppTypography.titleSmall,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'This candidate passed screening and is ready for a technical interview.',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Schedule a call with the candidate to proceed.',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  // Mark as ready for technical interview without meeting info
+                  await ref.read(candidatesProvider.notifier).updateCandidate(
+                    widget.candidateId,
+                    {'status': 'technical'},
+                  );
+                },
+                icon: const Icon(Icons.skip_next),
+                label: const Text('Skip & Mark as Scheduled'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.textSecondary,
+                  side: const BorderSide(color: AppColors.surfaceBorder),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParsedInfoDisplay() {
+    final info = _parsedInfo!;
+    final dateFormat = DateFormat('EEE, MMM d, yyyy');
+    final timeFormat = DateFormat('h:mm a');
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: info.isValid
+            ? AppColors.success.withValues(alpha: 0.1)
+            : AppColors.warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: info.isValid
+              ? AppColors.success.withValues(alpha: 0.3)
+              : AppColors.warning.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (info.meetingTime != null) ...[
+            _buildInfoRow(
+              Icons.calendar_today,
+              'Date',
+              dateFormat.format(info.meetingTime!),
+              AppColors.success,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            _buildInfoRow(
+              Icons.access_time,
+              'Time',
+              timeFormat.format(info.meetingTime!),
+              AppColors.success,
+            ),
+          ],
+          if (info.durationMinutes != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _buildInfoRow(
+              Icons.timelapse,
+              'Duration',
+              '${info.durationMinutes} minutes',
+              AppColors.success,
+            ),
+          ],
+          if (info.meetingLink != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _buildInfoRow(
+              Icons.videocam,
+              'Meeting Link',
+              info.meetingLink!,
+              AppColors.success,
+            ),
+          ],
+          if (info.errorMessage != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                const Icon(Icons.warning_amber, size: 16, color: AppColors.warning),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    info.errorMessage!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.warning,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value, Color color) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: AppSpacing.sm),
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -118,7 +429,7 @@ class TechnicalTab extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
           ElevatedButton.icon(
-            onPressed: () => context.push('/candidate/$candidateId/questions'),
+            onPressed: () => context.push('/candidate/${widget.candidateId}/questions'),
             icon: const Icon(Icons.play_arrow),
             label: const Text('Start Technical Interview'),
             style: ElevatedButton.styleFrom(
@@ -204,7 +515,7 @@ class TechnicalTab extends ConsumerWidget {
               Center(
                 child: OutlinedButton.icon(
                   onPressed: () =>
-                      context.push('/candidate/$candidateId/questions'),
+                      context.push('/candidate/${widget.candidateId}/questions'),
                   icon: const Icon(Icons.refresh),
                   label: const Text('Run Another Interview'),
                   style: OutlinedButton.styleFrom(

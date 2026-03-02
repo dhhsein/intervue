@@ -76,6 +76,7 @@ class AppColors {
   // Pipeline Stage Colors (for swimlane headers)
   // ============================================
   static const Color stageScreening = Color(0xFF3498DB);   // Blue
+  static const Color stageScheduled = Color(0xFFF39C12);   // Orange
   static const Color stageTechnical = Color(0xFFF1C40F);   // Yellow
   static const Color stageAssignment = Color(0xFF9B59B6);  // Purple
   static const Color stageFinalReview = Color(0xFF2ECC71); // Green
