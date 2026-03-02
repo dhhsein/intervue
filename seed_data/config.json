@@ -1,6 +1,6 @@
 {
-  "interviewerName": "Your Name",
-  "companyName": "Acrophase",
+  "interviewerName": "Interviewer",
+  "companyName": "Acrophase, IIT Madras",
   "roleName": "Python Backend Engineer",
   "location": "IIT Madras Campus, Chennai",
   "emailTemplate": "Hi {name},\n\nThank you for your interest in the Python Backend Engineer role at Acrophase. We're a center of excellence for sports technology based at IIT Madras, Chennai, building AI-powered platforms for personalized training and health tracking.\n\nBefore we move to the interview rounds, we'd like to understand your situation and alignment with this role. Please take 10-15 minutes to respond to the questions below.\n\nWe'd appreciate your response within 48 hours.\n\n{questions}\n\nWe're looking for people who are genuinely excited about building things, comfortable with ambiguity, and eager to own their work end-to-end. Looking forward to hearing from you.\n\nBest,\n{interviewer}\n{company}",

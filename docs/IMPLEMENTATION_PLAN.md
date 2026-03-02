@@ -33,7 +33,7 @@ InterVue is a Flutter web app for managing interview pipelines. It runs locally 
 | [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md) | Project directory layout |
 | [GOTCHAS.md](./GOTCHAS.md) | Known issues and required solutions |
 | [UI_COMPONENTS.md](./UI_COMPONENTS.md) | Reusable widget specs with interaction details |
-| `sample_data/` folder | Pre-loaded questions and sample candidates |
+| `seed_data/` folder | Pre-loaded questions and config templates |
 | `agent.md` (user-provided) | Coding conventions — follow all rules from this file |
 
 ## Tech Stack
@@ -63,7 +63,7 @@ Dart Shelf Server (backend, localhost:3001)
 5. **CORS middleware on the server from day one.** See GOTCHAS.md.
 6. **DataService abstraction.** All data access goes through an abstract class. LocalDataService talks to the shelf server. This enables Firebase migration later.
 7. **Data folder is outside the project.** Default: `~/intervue_data/`. Passed as `--data-dir` arg to the server.
-8. **All sample data from `sample_data/` folder gets copied into the data directory on first run** if the data directory is empty.
+8. **All seed data from `seed_data/` folder gets copied into the data directory on first run** if the data directory is empty.
 9. **Browser navigation must work.** Use `context.push()` for forward navigation (e.g., dashboard → candidate detail) and `context.pop()` or back button text links for going back. This ensures browser back/forward buttons work correctly. Never use `context.go()` for hierarchical navigation — only for replacing the current route entirely (e.g., after logout).
 
 ---
@@ -76,7 +76,7 @@ Each phase is scoped to be completable in a single Claude Code session. After co
 
 ### Phase 1: Project Scaffold + Server + Data Layer ✅ COMPLETE
 
-**Goal:** Flutter web project runs, Dart server runs, data flows end-to-end, sample data loads.
+**Goal:** Flutter web project runs, Dart server runs, data flows end-to-end, seed data loads.
 
 **Status:** ✅ Completed on 2026-03-02
 
@@ -89,7 +89,7 @@ Each phase is scoped to be completable in a single Claude Code session. After co
    - Resume upload and file serving with path traversal protection
    - Config endpoint
    - `--data-dir` flag with default `~/intervue_data/`
-   - Auto-copies `sample_data/` on first run
+   - Auto-copies `seed_data/` on first run
 
 2. **Data Models** (`lib/models/`):
    - `candidate.dart` - Candidate, CandidateStatus, StatusChange, CandidateDetail, PipelineStage
@@ -128,12 +128,12 @@ Each phase is scoped to be completable in a single Claude Code session. After co
    - `interview/interview_summary_screen.dart` — Implemented in Phase 4
    - `compare/compare_screen.dart` — Implemented in Phase 5
 
-8. **Sample Data** (`sample_data/`):
+8. **Seed Data** (`seed_data/`):
    - `config.json` - App configuration with email templates
    - `questions/screening.json` - 10 screening questions with input types
    - `questions/technical.json` - 14 technical questions with fraud probes
    - `questions/general.json` - 12 general questions
-   - No sample candidates - fresh installs start with empty candidate list
+   - No seed candidates - fresh installs start with empty candidate list
 
 9. **Scripts**:
    - `start.sh` - Launches server and Flutter web together
@@ -191,7 +191,7 @@ Each phase is scoped to be completable in a single Claude Code session. After co
    - `assignment_tab.dart` — Implemented in Phase 5
 
 **Acceptance Criteria:**
-- [x] Dashboard shows sample candidates in correct pipeline columns
+- [x] Dashboard shows candidates in correct pipeline columns
 - [x] Search filters candidates by name across all columns
 - [x] Can add a new candidate with name, email, phone, resume
 - [x] Candidate detail view shows all profile information
@@ -439,7 +439,7 @@ Additional improvements made after Phase 5 completion:
 
 End-to-end checks:
 
-- [ ] Fresh start: delete data dir, restart server, sample data loads correctly
+- [ ] Fresh start: delete data dir, restart server, seed data (questions + config) loads correctly
 - [ ] Add a new candidate → screen them → mark as STRONG → verify "Pending Scheduling" status → mark as scheduled → run technical interview → advance to assignment → review assignment → compare with another candidate → hire
 - [ ] All data persists across browser refreshes at every step
 - [ ] No CORS errors in browser console

@@ -10,7 +10,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_router/shelf_router.dart';
 
 late String dataDir;
-late String sampleDataDir;
+late String seedDataDir;
 
 void main(List<String> args) async {
   final parser = ArgParser()
@@ -22,7 +22,7 @@ void main(List<String> args) async {
   dataDir = results['data-dir'] as String;
 
   final scriptDir = path.dirname(Platform.script.toFilePath());
-  sampleDataDir = path.normalize(path.join(scriptDir, '..', '..', 'sample_data'));
+  seedDataDir = path.normalize(path.join(scriptDir, '..', '..', 'seed_data'));
 
   await initializeDataDir();
 
@@ -92,23 +92,23 @@ Future<void> initializeDataDir() async {
 
   if (isEmpty) {
     // ignore: avoid_print
-    print('Initializing data directory with sample data...');
+    print('Initializing data directory with seed data...');
 
     await dir.create(recursive: true);
     await candidatesDir.create(recursive: true);
     await questionsDir.create(recursive: true);
 
-    await _copyDirectory(Directory(sampleDataDir), dir);
+    await _copyDirectory(Directory(seedDataDir), dir);
 
     // ignore: avoid_print
-    print('Initialized data directory with sample data at $dataDir');
+    print('Initialized data directory with seed data at $dataDir');
   }
 }
 
 Future<void> _copyDirectory(Directory source, Directory destination) async {
   if (!await source.exists()) {
     // ignore: avoid_print
-    print('Warning: Sample data directory not found at ${source.path}');
+    print('Warning: Seed data directory not found at ${source.path}');
     return;
   }
 
