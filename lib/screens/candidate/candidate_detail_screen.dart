@@ -95,12 +95,12 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
 
     return Column(
       children: [
-        _buildTopBar(),
         _buildHeader(candidate),
         _buildTabs(),
         Expanded(
           child: TabBarView(
             controller: _tabController,
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               ProfileTab(detail: detail),
               ScreeningTab(candidateId: widget.candidateId),
@@ -110,36 +110,6 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTopBar() {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(
-          bottom: BorderSide(color: AppColors.surfaceBorder),
-        ),
-      ),
-      child: Row(
-        children: [
-          TextButton.icon(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/');
-              }
-            },
-            icon: const Icon(Icons.arrow_back),
-            label: const Text('Dashboard'),
-          ),
-          const Spacer(),
-          const SaveIndicator(),
-        ],
-      ),
     );
   }
 
@@ -157,6 +127,19 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          IconButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Back to Dashboard',
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,22 +203,19 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          const SaveIndicator(),
+          const SizedBox(width: AppSpacing.lg),
+          Row(
             children: [
-              Row(
-                children: [
-                  Text(
-                    'Status: ',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  StatusDropdown(
-                    value: candidate.status,
-                    onChanged: (newStatus) => _updateStatus(candidate, newStatus),
-                  ),
-                ],
+              Text(
+                'Status: ',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              StatusDropdown(
+                value: candidate.status,
+                onChanged: (newStatus) => _updateStatus(candidate, newStatus),
               ),
             ],
           ),

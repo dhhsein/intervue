@@ -26,15 +26,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final searchQuery = ref.watch(searchQueryProvider);
+    final candidatesAsync = ref.watch(filteredCandidatesProvider(searchQuery));
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          Column(
-            children: [
-              _buildTopBar(),
-              Expanded(child: _buildContent()),
-            ],
+          candidatesAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => _buildErrorState(error),
+            data: (candidates) => Column(
+              children: [
+                _buildTopBar(candidates),
+                Expanded(child: _buildPipelineView(candidates)),
+              ],
+            ),
           ),
           if (_showAddPanel)
             AddCandidatePanel(
@@ -48,7 +55,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildTopBar() {
+  Widget _buildTopBar(List<Candidate> candidates) {
+    final rejected = candidates
+        .where((c) => c.status.pipelineStage == PipelineStage.rejected)
+        .toList();
+    final hired = candidates
+        .where((c) => c.status.pipelineStage == PipelineStage.hired)
+        .toList();
+
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -60,13 +74,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       child: Row(
         children: [
-          Text('InterVue', style: AppTypography.titleMedium),
+          Text('Overview', style: AppTypography.titleMedium),
           const Spacer(),
           AppSearchBar(
             onChanged: (query) {
               ref.read(searchQueryProvider.notifier).state = query;
             },
           ),
+          const SizedBox(width: AppSpacing.md),
+          ElevatedButton.icon(
+            onPressed: () => setState(() => _showAddPanel = true),
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Add Candidate'),
+          ),
+          const SizedBox(width: AppSpacing.lg),
+          IconButton(
+            onPressed: () => context.push('/compare'),
+            icon: const Icon(Icons.compare_arrows),
+            tooltip: 'Compare Finalists',
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          _buildCountBadge(rejected.length, AppColors.error, 'Rejected', rejected),
+          const SizedBox(width: AppSpacing.sm),
+          _buildCountBadge(hired.length, AppColors.success, 'Hired', hired),
           const SizedBox(width: AppSpacing.lg),
           const SaveIndicator(),
         ],
@@ -74,14 +105,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildContent() {
-    final searchQuery = ref.watch(searchQueryProvider);
-    final candidatesAsync = ref.watch(filteredCandidatesProvider(searchQuery));
-
-    return candidatesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(error),
-      data: (candidates) => _buildPipelineView(candidates),
+  Widget _buildCountBadge(int count, Color color, String tooltip, List<Candidate> candidates) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: candidates.isEmpty ? null : () => _showCandidateList(tooltip, candidates),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '$count',
+              style: AppTypography.label.copyWith(
+                color: color,
+                fontSize: 11,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -125,144 +172,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final finalReview = candidates
         .where((c) => c.status.pipelineStage == PipelineStage.finalReview)
         .toList();
-    final rejected = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.rejected)
-        .toList();
-    final hired = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.hired)
-        .toList();
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
-          const SizedBox(height: AppSpacing.lg),
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: PipelineColumn(
-                    title: 'Screening',
-                    candidates: screening,
-                    onCandidateTap: _navigateToCandidate,
-                    accentColor: AppColors.info,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: PipelineColumn(
-                    title: 'Technical',
-                    candidates: technical,
-                    onCandidateTap: _navigateToCandidate,
-                    accentColor: AppColors.accent,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: PipelineColumn(
-                    title: 'Assignment',
-                    candidates: assignment,
-                    onCandidateTap: _navigateToCandidate,
-                    accentColor: AppColors.warning,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: PipelineColumn(
-                    title: 'Final Review',
-                    candidates: finalReview,
-                    onCandidateTap: _navigateToCandidate,
-                    accentColor: AppColors.success,
-                  ),
-                ),
-              ],
+            child: PipelineColumn(
+              title: 'Screening',
+              candidates: screening,
+              onCandidateTap: _navigateToCandidate,
+              accentColor: AppColors.info,
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          _buildBottomSummary(rejected, hired),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Pipeline Overview', style: AppTypography.titleLarge),
-        ElevatedButton.icon(
-          onPressed: () => setState(() => _showAddPanel = true),
-          icon: const Icon(Icons.add),
-          label: const Text('Add Candidate'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomSummary(List<Candidate> rejected, List<Candidate> hired) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          _buildSummaryItem(
-            'Rejected',
-            rejected.length,
-            AppColors.error,
-            onTap: rejected.isEmpty ? null : () => _showCandidateList('Rejected', rejected),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: PipelineColumn(
+              title: 'Technical',
+              candidates: technical,
+              onCandidateTap: _navigateToCandidate,
+              accentColor: AppColors.accent,
+            ),
           ),
-          const SizedBox(width: AppSpacing.xl),
-          _buildSummaryItem(
-            'Hired',
-            hired.length,
-            AppColors.success,
-            onTap: hired.isEmpty ? null : () => _showCandidateList('Hired', hired),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: PipelineColumn(
+              title: 'Assignment',
+              candidates: assignment,
+              onCandidateTap: _navigateToCandidate,
+              accentColor: AppColors.warning,
+            ),
           ),
-          const Spacer(),
-          TextButton.icon(
-            onPressed: () => context.push('/compare'),
-            icon: const Icon(Icons.compare_arrows),
-            label: const Text('Compare Finalists'),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: PipelineColumn(
+              title: 'Final Review',
+              candidates: finalReview,
+              onCandidateTap: _navigateToCandidate,
+              accentColor: AppColors.success,
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryItem(
-    String label,
-    int count,
-    Color color, {
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
-        child: Row(
-          children: [
-            Text(
-              '$label: ',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            Text(
-              '$count',
-              style: AppTypography.titleSmall.copyWith(color: color),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -12,7 +12,7 @@ cd /Users/dan/Documents/intervue
 flutter run -d chrome
 ```
 
-**Current Status:** Phase 2 ✅ Complete | **Next:** Phase 3 - Screening Round Flow
+**Current Status:** Phase 3 ✅ Complete | **Next:** Phase 4 - Question Bank + Interview Session
 
 ---
 
@@ -213,43 +213,56 @@ flutter run -d chrome
 
 ---
 
-### Phase 3: Screening Round Flow
+### Phase 3: Screening Round Flow ✅ COMPLETE
 
 **Goal:** Can send screening emails, record responses with UI-friendly inputs, grade candidates.
 
-**Tasks:**
-1. Build the Screening tab in Candidate Detail (see WIREFRAMES.md — Screening Tab):
-   - Show all 10 screening questions from the question bank
-   - Each question has a UI-friendly response input (see UI_COMPONENTS.md for each question type):
-     - Q1 (Still interested): Toggle chips — "Yes, actively looking" / "Open but passive" / "Not sure"
-     - Q2 (On-site Chennai): Toggle chips — "Yes, already in Chennai" / "Yes, will relocate" / "Need to discuss" / "Cannot relocate"
-     - Q3 (CTC): Two number fields — Current CTC, Expected CTC (with ₹ and L/LPA suffix)
-     - Q4 (Standing offers): Toggle chips — "No offers" / "Has offer, likely to take" / "Has offer, unlikely to take" / "Multiple offers"
-     - Q5 (Reason for switching): Multi-select chips — "Growth" / "Compensation" / "Domain interest" / "Better team" / "Current role stagnant" / "Other" + text field
-     - Q6 (Stack alignment): Rating chips — "Strong match" / "Partial match" / "Weak match" + notes
-     - Q7 (Small team comfort): Toggle chips — "Very comfortable" / "Somewhat" / "Prefer larger teams"
-     - Q8 (Notice period): Number field (days) + toggle "Negotiable" yes/no
-     - Q9 (Tech experience): For each tech (FastAPI, SQLAlchemy, Docker, K8s, Terraform) — radio: "None" / "Basic" / "Intermediate" / "Advanced"
-     - Q10 (Their questions): Free text area
-   - Each question also has a small notes text field for your observations
-2. Screening grade selector: Three large tappable cards — STRONG (green) / MAYBE (amber) / NO (red)
-3. Phone screen section (below email responses):
-   - Toggle: "Phone screen conducted" yes/no
-   - If yes: communication score (1-5 tappable), logistics confirmed toggles, notes field
-4. "Copy Screening Email" button:
-   - Generates the D10 email with candidate's first name filled in
-   - Copies to clipboard with a toast confirmation
-5. Screening status tracking: Email sent date, response received date, phone screen date
-6. All inputs auto-save on change (debounced for text fields)
+**Status:** ✅ Completed on 2026-03-02
+
+**What Was Built:**
+
+1. **Reusable Widgets** (`lib/widgets/`):
+   - `toggle_chips.dart` — Single-select chip buttons with tap-to-select/deselect
+   - `multi_select_chips.dart` — Multi-select chips with optional "Other" text field
+   - `number_input.dart` — Styled number input with prefix/suffix (₹, LPA, days)
+   - `tech_level_matrix.dart` — Radio grid for tech experience levels
+   - `grade_selector.dart` — Large tappable cards for STRONG/MAYBE/NO grades
+   - `score_selector.dart` — 1-5 tappable circles with color-coded scores
+   - `auto_save_text_field.dart` — Text field with 500ms debounce auto-save
+
+2. **Screening Provider** (`lib/providers/screening_provider.dart`):
+   - `screeningNotifierProvider` — Family provider for per-candidate screening state
+   - Auto-save on every response update
+   - Methods: updateResponse, updateGrade, updatePhoneScreen, markEmailSent
+
+3. **Config Provider** (`lib/providers/config_provider.dart`):
+   - Loads email templates from server config
+
+4. **Screening Tab** (`lib/screens/candidate/tabs/screening_tab.dart`):
+   - Header with screening dates and "Copy Screening Email" button
+   - All 10 questions with UI-friendly inputs:
+     - Q1-Q2, Q4, Q6-Q7: Toggle chips (single select)
+     - Q3: Number pair (Current CTC / Expected CTC)
+     - Q5: Multi-select chips with "Other" text field
+     - Q8: Number input + negotiable toggle
+     - Q9: Tech level matrix (5 techs × 4 levels)
+     - Q10: Free text area
+   - Each question has notes field with auto-save
+   - Screening grade selector (STRONG/MAYBE/NO)
+   - Phone screen section with:
+     - Conducted toggle
+     - Communication score (1-5)
+     - Logistics confirmed chips (Salary/Notice/On-site)
+     - Notes field
 
 **Acceptance Criteria:**
-- [ ] All 10 screening questions render with appropriate UI inputs (not text fields)
-- [ ] Can fill in all screening responses using taps/selections (minimal typing)
-- [ ] Screening grade (Strong/Maybe/No) saves and shows on dashboard card
-- [ ] Phone screen section toggles visibility
-- [ ] "Copy Screening Email" generates correct email with candidate name
-- [ ] All data persists across page refreshes
-- [ ] Notes fields auto-save with debounce
+- [x] All 10 screening questions render with appropriate UI inputs (not text fields)
+- [x] Can fill in all screening responses using taps/selections (minimal typing)
+- [x] Screening grade (Strong/Maybe/No) saves and shows on dashboard card
+- [x] Phone screen section toggles visibility
+- [x] "Copy Screening Email" generates correct email with candidate name
+- [x] All data persists across page refreshes
+- [x] Notes fields auto-save with debounce
 
 ---
 

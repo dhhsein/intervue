@@ -25,35 +25,39 @@ class ProfileTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: Wrap(
+            spacing: AppSpacing.lg,
+            runSpacing: AppSpacing.lg,
             children: [
-              _buildSection(
+              _buildSectionCard(
                 title: 'Contact',
                 child: _buildContactInfo(candidate),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              _buildSection(
+              _buildSectionCard(
                 title: 'Compensation',
                 child: _buildCompensationInfo(screening),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              _buildSection(
+              _buildSectionCard(
                 title: 'Availability',
                 child: _buildAvailabilityInfo(screening),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              _buildSection(
+              _buildSectionCard(
                 title: 'Timeline',
                 child: _buildTimeline(candidate),
               ),
-              const SizedBox(height: AppSpacing.lg),
               _buildRejectButton(context, ref, candidate),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionCard({required String title, required Widget child}) {
+    return SizedBox(
+      width: 420,
+      child: _buildSection(title: title, child: child),
     );
   }
 
