@@ -87,28 +87,7 @@ class PipelineColumn extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.inbox_outlined,
-              size: 32,
-              color: AppColors.textTertiary,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'No candidates',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 
   Widget _buildCandidateList() {

@@ -87,11 +87,11 @@ class GradeSelector extends StatelessWidget {
   /// Alias for backwards compatibility.
   static const recommendationOptions = technicalGradeOptions;
 
-  /// Pre-built assessment grade options (HIRE/HOLD/REJECT).
+  /// Pre-built assessment grade options (PASS/HOLD/REJECT).
   static const assessmentGradeOptions = [
     GradeOption(
-      value: 'hire',
-      label: 'HIRE',
+      value: 'pass',
+      label: 'PASS',
       icon: Icons.check_circle,
       iconOutlined: Icons.check_circle_outline,
       color: AppColors.success,

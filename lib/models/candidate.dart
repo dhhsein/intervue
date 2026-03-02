@@ -135,6 +135,7 @@ enum CandidateStatus {
       case CandidateStatus.phoneScreen:
         return PipelineStage.screening;
       case CandidateStatus.pendingScheduling:
+        return PipelineStage.scheduled;
       case CandidateStatus.technical:
         return PipelineStage.technical;
       case CandidateStatus.assignment:

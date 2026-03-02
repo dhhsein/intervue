@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -36,6 +35,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   bool _isSubmitting = false;
   bool _isExtracting = false;
   String? _createdCandidateId;
+  Map<String, String?>? _extractedInfo;
 
   @override
   void dispose() {
@@ -62,7 +62,15 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
 
   Future<void> _extractFromResume() async {
     if (_selectedFileBytes == null) return;
-    if (!_formKey.currentState!.validate()) return;
+
+    // Only require name for extraction
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a name first')),
+      );
+      return;
+    }
 
     setState(() => _isExtracting = true);
 
@@ -72,13 +80,9 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
       // Create candidate first if not already created
       if (_createdCandidateId == null) {
         final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
-              name: _nameController.text.trim(),
-              email: _emailController.text.trim().isEmpty
-                  ? 'pending@extract.local'
-                  : _emailController.text.trim(),
-              phone: _phoneController.text.trim().isEmpty
-                  ? null
-                  : _phoneController.text.trim(),
+              name: name,
+              email: 'pending@extract.local',
+              phone: null,
             );
         _createdCandidateId = candidate.id;
 
@@ -89,23 +93,15 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
       // Extract contact info
       final info = await dataService.extractResumeInfo(_createdCandidateId!);
 
-      // Populate empty fields
-      if (info['email'] != null && (_emailController.text.isEmpty || _emailController.text == 'pending@extract.local')) {
-        _emailController.text = info['email']!;
-      }
-      if (info['phone'] != null && _phoneController.text.isEmpty) {
-        _phoneController.text = info['phone']!;
-      }
-
       if (mounted) {
+        setState(() => _extractedInfo = info);
+
         final extractedCount = info.values.where((v) => v != null).length;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(extractedCount > 0
-                ? 'Extracted $extractedCount field(s) from resume'
-                : 'Could not extract contact info from resume'),
-          ),
-        );
+        if (extractedCount == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not extract contact info from resume')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -288,6 +284,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
           _buildTextField(
             label: 'Phone',
             controller: _phoneController,
+            required: true,
             hint: '+91-98765-43210',
             keyboardType: TextInputType.phone,
           ),
@@ -396,8 +393,83 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
                 : const Icon(Icons.auto_fix_high, size: 18),
             label: const Text('Extract from Resume'),
           ),
+          if (_extractedInfo != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _buildExtractedFields(),
+          ],
         ],
       ],
+    );
+  }
+
+  Widget _buildExtractedFields() {
+    final items = <Widget>[];
+
+    if (_extractedInfo!['email'] != null) {
+      items.add(_buildExtractedChip('Email', _extractedInfo!['email']!));
+    }
+    if (_extractedInfo!['phone'] != null) {
+      items.add(_buildExtractedChip('Phone', _extractedInfo!['phone']!));
+    }
+
+    if (items.isEmpty) {
+      return Text(
+        'No contact info found in resume',
+        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+      );
+    }
+
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: items,
+    );
+  }
+
+  Widget _buildExtractedChip(String label, String value) {
+    return InkWell(
+      onTap: () {
+        Clipboard.setData(ClipboardData(text: value));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Copied $label: $value'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.info.withAlpha(25),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.info.withAlpha(50)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              label == 'Email' ? Icons.email_outlined : Icons.phone_outlined,
+              size: 16,
+              color: AppColors.info,
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              value,
+              style: AppTypography.bodySmall.copyWith(color: AppColors.info),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            Icon(
+              Icons.copy,
+              size: 14,
+              color: AppColors.info.withAlpha(150),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

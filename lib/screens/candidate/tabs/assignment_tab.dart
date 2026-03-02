@@ -217,13 +217,11 @@ class AssignmentTab extends ConsumerWidget {
   }
 
   Future<void> _copyAssignmentEmail(BuildContext context, WidgetRef ref) async {
-    final configAsync = ref.read(configProvider);
-    final candidateAsync = ref.read(candidateDetailProvider(candidateId));
+    final config = await ref.read(configProvider.future);
+    if (!context.mounted) return;
+    final candidateDetail = ref.read(candidateDetailProvider(candidateId)).valueOrNull;
 
-    final config = configAsync.valueOrNull;
-    final candidateDetail = candidateAsync.valueOrNull;
-
-    if (config == null || config.assignmentBrief == null) {
+    if (config.assignmentBrief == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Assignment brief not configured'),
@@ -967,23 +965,16 @@ Best,
                   notifier.updateRecommendation(value);
 
                   // Update candidate status based on grade
-                  if (value == 'hire') {
-                    // Hire → move to final review
+                  // Only Pass changes status to Final Review
+                  // Hold and Reject do not change status
+                  if (value == 'pass') {
                     await ref.read(candidatesProvider.notifier).updateCandidate(
                       candidateId,
                       {'status': 'final_review'},
                     );
-                  } else if (value == 'reject') {
-                    // Reject → mark as rejected
-                    await ref.read(candidatesProvider.notifier).updateCandidate(
-                      candidateId,
-                      {
-                        'status': 'rejected',
-                        'rejectionReason': 'Failed assignment review',
-                      },
-                    );
+                    // Refresh the candidate detail to show updated status
+                    ref.invalidate(candidateDetailProvider(candidateId));
                   }
-                  // Hold → stay in assignment, no status change needed
                 },
               ),
             ],

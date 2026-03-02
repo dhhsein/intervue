@@ -218,12 +218,12 @@ class _CandidateCardState extends State<CandidateCard> {
       children: [
         if (candidate.technicalScore != null)
           Text(
-            'Tech: ${candidate.technicalScore!.toStringAsFixed(1)}',
+            'Technical: ${candidate.technicalScore!.toStringAsFixed(1)}',
             style: AppTypography.bodySmall,
           ),
         if (candidate.assignmentScore != null)
           Text(
-            'Assign: ${candidate.assignmentScore!.toStringAsFixed(1)}',
+            'Assignment: ${candidate.assignmentScore!.toStringAsFixed(1)}',
             style: AppTypography.bodySmall,
           ),
       ],
