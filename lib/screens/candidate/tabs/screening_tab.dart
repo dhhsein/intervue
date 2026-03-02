@@ -102,27 +102,43 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
   }
 
   Widget _buildDateRow(ScreeningData screening) {
-    final parts = <String>[];
+    final pills = <Widget>[];
     if (screening.emailSentAt != null) {
-      parts.add('Email sent: ${_dateFormat.format(screening.emailSentAt!)}');
+      pills.add(_buildDatePill('Email sent', _dateFormat.format(screening.emailSentAt!)));
     }
     if (screening.responseReceivedAt != null) {
-      parts.add('Response: ${_dateFormat.format(screening.responseReceivedAt!)}');
+      pills.add(_buildDatePill('Response', _dateFormat.format(screening.responseReceivedAt!)));
     }
     if (screening.phoneScreenAt != null) {
-      parts.add('Phone screen: ${_dateFormat.format(screening.phoneScreenAt!)}');
+      pills.add(_buildDatePill('Phone screen', _dateFormat.format(screening.phoneScreenAt!)));
     }
 
-    if (parts.isEmpty) {
+    if (pills.isEmpty) {
       return Text(
         'No screening activity yet',
         style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
       );
     }
 
-    return Text(
-      parts.join('  ·  '),
-      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+    return Wrap(
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
+      children: pills,
+    );
+  }
+
+  Widget _buildDatePill(String label, String date) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.surfaceBorder),
+      ),
+      child: Text(
+        '$label: $date',
+        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+      ),
     );
   }
 

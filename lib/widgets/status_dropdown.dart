@@ -17,7 +17,7 @@ class StatusDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(8),
@@ -25,6 +25,7 @@ class StatusDropdown extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<CandidateStatus>(
+          isDense: true,
           value: value,
           onChanged: (newValue) {
             if (newValue != null) {
@@ -32,7 +33,7 @@ class StatusDropdown extends StatelessWidget {
             }
           },
           dropdownColor: AppColors.surface,
-          icon: Icon(Icons.expand_more, color: AppColors.textSecondary),
+          icon: const Icon(Icons.expand_more, color: AppColors.textSecondary),
           style: AppTypography.bodyMedium,
           items: CandidateStatus.values.map((status) {
             return DropdownMenuItem(
@@ -60,19 +61,28 @@ class StatusDropdown extends StatelessWidget {
   }
 
   Color _getStatusColor(CandidateStatus status) {
-    switch (status.pipelineStage) {
-      case PipelineStage.screening:
-        return AppColors.info;
-      case PipelineStage.technical:
-        return AppColors.accent;
-      case PipelineStage.assignment:
-        return AppColors.warning;
-      case PipelineStage.finalReview:
-        return AppColors.accent;
-      case PipelineStage.hired:
-        return AppColors.success;
-      case PipelineStage.rejected:
-        return AppColors.error;
+    // Match colors with StatusBadge
+    switch (status) {
+      case CandidateStatus.newCandidate:
+        return const Color(0xFFF1C40F); // Yellow
+      case CandidateStatus.screeningSent:
+        return const Color(0xFF5DADE2); // Light blue
+      case CandidateStatus.screeningDone:
+        return const Color(0xFF3498DB); // Blue
+      case CandidateStatus.phoneScreen:
+        return const Color(0xFF2471A3); // Dark blue
+      case CandidateStatus.technical:
+        return const Color(0xFFE67E22); // Orange
+      case CandidateStatus.assignment:
+        return const Color(0xFF9B59B6); // Magenta
+      case CandidateStatus.finalReview:
+        return const Color(0xFF00BCD4); // Cyan
+      case CandidateStatus.offer:
+        return const Color(0xFF2ECC71); // Green
+      case CandidateStatus.hired:
+        return const Color(0xFFE8E8E8); // White
+      case CandidateStatus.rejected:
+        return const Color(0xFFE74C3C); // Red
     }
   }
 }

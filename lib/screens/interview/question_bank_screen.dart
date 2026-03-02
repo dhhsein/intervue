@@ -32,6 +32,21 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
     final candidateAsync = ref.watch(candidateDetailProvider(widget.candidateId));
     final selectedIds = ref.watch(selectedQuestionsProvider);
 
+    // Get all filtered question IDs for select all/deselect all
+    final allFilteredIds = questionsAsync.whenOrNull(
+      data: (grouped) {
+        final ids = <String>[];
+        for (final entry in grouped.entries) {
+          for (final q in entry.value) {
+            if (_depthFilter == 'all' || q.depth == _depthFilter) {
+              ids.add(q.id);
+            }
+          }
+        }
+        return ids;
+      },
+    ) ?? [];
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
@@ -44,7 +59,7 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
               data: (grouped) => _buildQuestionList(grouped, selectedIds),
             ),
           ),
-          _buildBottomBar(selectedIds.length),
+          _buildBottomBar(selectedIds.length, selectedIds, allFilteredIds),
         ],
       ),
     );
@@ -63,62 +78,36 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
           bottom: BorderSide(color: AppColors.surfaceBorder),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/candidate/${widget.candidateId}');
-                  }
-                },
-                icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Question Bank', style: AppTypography.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Selecting for: $candidateName',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: selectedCount > 0
-                      ? AppColors.accent.withValues(alpha: 0.2)
-                      : AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'Selected: $selectedCount questions',
+          IconButton(
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/candidate/${widget.candidateId}');
+              }
+            },
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Back',
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Question Bank', style: AppTypography.titleLarge),
+                const SizedBox(height: 4),
+                Text(
+                  'Selecting for: $candidateName',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: selectedCount > 0
-                        ? AppColors.accent
-                        : AppColors.textSecondary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
           _buildFilters(),
         ],
       ),
@@ -127,14 +116,8 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
 
   Widget _buildFilters() {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'Filter:',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
         _buildFilterChip('All', 'all'),
         const SizedBox(width: AppSpacing.sm),
         _buildFilterChip('Core', 'core'),
@@ -153,8 +136,11 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accent : AppColors.surfaceLight,
+          color: isSelected ? AppColors.accent : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : AppColors.surfaceBorder,
+          ),
         ),
         child: Text(
           label,
@@ -319,7 +305,7 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
     String label;
     switch (depth) {
       case 'core':
-        color = AppColors.accent;
+        color = const Color(0xFFE67E22); // Orange - don't use accent for categories
         label = 'Core';
         break;
       case 'nice_to_have':
@@ -361,7 +347,11 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
     }
   }
 
-  Widget _buildBottomBar(int selectedCount) {
+  Widget _buildBottomBar(int selectedCount, Set<String> selectedIds, List<String> allFilteredIds) {
+    final allSelected = allFilteredIds.isNotEmpty &&
+        allFilteredIds.every((id) => selectedIds.contains(id));
+    final noneSelected = allFilteredIds.every((id) => !selectedIds.contains(id));
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
@@ -373,16 +363,35 @@ class _QuestionBankScreenState extends ConsumerState<QuestionBankScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (selectedCount > 0)
-            TextButton(
-              onPressed: () {
-                ref.read(selectedQuestionsProvider.notifier).state = {};
-              },
-              child: Text(
-                'Clear Selection',
-                style: TextStyle(color: AppColors.textSecondary),
+          TextButton(
+            onPressed: allSelected ? null : () {
+              final current = ref.read(selectedQuestionsProvider);
+              ref.read(selectedQuestionsProvider.notifier).state = {
+                ...current,
+                ...allFilteredIds,
+              };
+            },
+            child: Text(
+              'Select All',
+              style: TextStyle(
+                color: allSelected ? AppColors.textTertiary : AppColors.accent,
               ),
             ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          TextButton(
+            onPressed: noneSelected ? null : () {
+              final current = ref.read(selectedQuestionsProvider);
+              ref.read(selectedQuestionsProvider.notifier).state =
+                  current.difference(allFilteredIds.toSet());
+            },
+            child: Text(
+              'Deselect All',
+              style: TextStyle(
+                color: noneSelected ? AppColors.textTertiary : AppColors.accent,
+              ),
+            ),
+          ),
           const SizedBox(width: AppSpacing.lg),
           SizedBox(
             width: 300,

@@ -72,7 +72,7 @@ class _ChipButtonState extends State<_ChipButton> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: widget.isSelected
-                ? AppColors.accentSoft
+                ? AppColors.accent
                 : (_isHovered ? AppColors.surfaceLight : AppColors.surface),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
@@ -87,7 +87,7 @@ class _ChipButtonState extends State<_ChipButton> {
               widget.label,
               style: AppTypography.bodySmall.copyWith(
                 color: widget.isSelected
-                    ? AppColors.accent
+                    ? Colors.white
                     : AppColors.textSecondary,
               ),
             ),

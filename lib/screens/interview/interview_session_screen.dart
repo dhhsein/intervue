@@ -17,10 +17,7 @@ import '../../widgets/score_selector.dart';
 class InterviewSessionScreen extends ConsumerStatefulWidget {
   final String candidateId;
 
-  const InterviewSessionScreen({
-    super.key,
-    required this.candidateId,
-  });
+  const InterviewSessionScreen({super.key, required this.candidateId});
 
   @override
   ConsumerState<InterviewSessionScreen> createState() =>
@@ -68,7 +65,9 @@ class _InterviewSessionScreenState
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(interviewProvider);
-    final candidateAsync = ref.watch(candidateDetailProvider(widget.candidateId));
+    final candidateAsync = ref.watch(
+      candidateDetailProvider(widget.candidateId),
+    );
 
     if (session == null) {
       return Scaffold(
@@ -94,9 +93,9 @@ class _InterviewSessionScreenState
       );
     }
 
-    final candidateName = candidateAsync.whenOrNull(
-      data: (detail) => detail.candidate.name,
-    ) ?? 'Candidate';
+    final candidateName =
+        candidateAsync.whenOrNull(data: (detail) => detail.candidate.name) ??
+        'Candidate';
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -107,9 +106,7 @@ class _InterviewSessionScreenState
         body: Column(
           children: [
             _buildHeader(candidateName, session),
-            Expanded(
-              child: _buildQuestionArea(session),
-            ),
+            Expanded(child: _buildQuestionArea(session)),
             _buildBottomBar(session),
           ],
         ),
@@ -157,9 +154,7 @@ class _InterviewSessionScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.surfaceBorder),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.surfaceBorder)),
       ),
       child: Row(
         children: [
@@ -188,6 +183,16 @@ class _InterviewSessionScreenState
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          ElevatedButton(
+            onPressed: _finishRound,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.success,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            child: const Text('Finish Round'),
           ),
           const SizedBox(width: AppSpacing.lg),
           Container(
@@ -248,10 +253,7 @@ class _InterviewSessionScreenState
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.surfaceBorder),
                 ),
-                child: Text(
-                  question.question,
-                  style: AppTypography.bodyLarge,
-                ),
+                child: Text(question.question, style: AppTypography.bodyLarge),
               ),
               const SizedBox(height: AppSpacing.lg),
 
@@ -355,9 +357,9 @@ class _InterviewSessionScreenState
         ScoreSelector(
           value: score.score,
           onChanged: (value) {
-            ref.read(interviewProvider.notifier).updateCurrentScore(
-              score: value,
-            );
+            ref
+                .read(interviewProvider.notifier)
+                .updateCurrentScore(score: value);
           },
         ),
       ],
@@ -374,11 +376,26 @@ class _InterviewSessionScreenState
           ),
         ),
         const SizedBox(width: AppSpacing.lg),
-        _buildFraudDot(FraudFlag.none, score.fraudFlag, 'None', AppColors.success),
+        _buildFraudDot(
+          FraudFlag.none,
+          score.fraudFlag,
+          'None',
+          AppColors.success,
+        ),
         const SizedBox(width: AppSpacing.md),
-        _buildFraudDot(FraudFlag.concern, score.fraudFlag, 'Concern', AppColors.warning),
+        _buildFraudDot(
+          FraudFlag.concern,
+          score.fraudFlag,
+          'Concern',
+          AppColors.warning,
+        ),
         const SizedBox(width: AppSpacing.md),
-        _buildFraudDot(FraudFlag.suspect, score.fraudFlag, 'Suspect', AppColors.error),
+        _buildFraudDot(
+          FraudFlag.suspect,
+          score.fraudFlag,
+          'Suspect',
+          AppColors.error,
+        ),
       ],
     );
   }
@@ -392,9 +409,9 @@ class _InterviewSessionScreenState
     final isSelected = flag == current;
     return GestureDetector(
       onTap: () {
-        ref.read(interviewProvider.notifier).updateCurrentScore(
-          fraudFlag: flag,
-        );
+        ref
+            .read(interviewProvider.notifier)
+            .updateCurrentScore(fraudFlag: flag);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -431,13 +448,7 @@ class _InterviewSessionScreenState
   }
 
   Widget _buildResponseQualitySection(QuestionScore score) {
-    final qualities = [
-      'Detailed',
-      'Textbook',
-      'Vague',
-      'Wrong',
-      'No answer',
-    ];
+    final qualities = ['Detailed', 'Textbook', 'Vague', 'Wrong', 'No answer'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,9 +467,11 @@ class _InterviewSessionScreenState
             final isSelected = score.responseQuality == quality;
             return GestureDetector(
               onTap: () {
-                ref.read(interviewProvider.notifier).updateCurrentScore(
-                  responseQuality: isSelected ? null : quality,
-                );
+                ref
+                    .read(interviewProvider.notifier)
+                    .updateCurrentScore(
+                      responseQuality: isSelected ? null : quality,
+                    );
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -509,9 +522,9 @@ class _InterviewSessionScreenState
           hint: 'Add notes about the response...',
           maxLines: 4,
           onSave: (value) async {
-            ref.read(interviewProvider.notifier).updateCurrentScore(
-              notes: value.isEmpty ? null : value,
-            );
+            ref
+                .read(interviewProvider.notifier)
+                .updateCurrentScore(notes: value.isEmpty ? null : value);
           },
         ),
       ],
@@ -523,9 +536,7 @@ class _InterviewSessionScreenState
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.surfaceBorder),
-        ),
+        border: Border(top: BorderSide(color: AppColors.surfaceBorder)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -544,28 +555,15 @@ class _InterviewSessionScreenState
               side: BorderSide(color: AppColors.surfaceBorder),
             ),
           ),
-          Row(
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() => _showFraudProbe = false);
-                  ref.read(interviewProvider.notifier).skipCurrentQuestion();
-                },
-                child: Text(
-                  'Skip',
-                  style: TextStyle(color: AppColors.textSecondary),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              ElevatedButton(
-                onPressed: _finishRound,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.success,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Finish Round'),
-              ),
-            ],
+          TextButton(
+            onPressed: () {
+              setState(() => _showFraudProbe = false);
+              ref.read(interviewProvider.notifier).skipCurrentQuestion();
+            },
+            child: Text(
+              'Skip',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           OutlinedButton.icon(
             onPressed: session.isLastQuestion
