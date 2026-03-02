@@ -12,7 +12,7 @@ cd /Users/dan/Documents/intervue
 flutter run -d chrome
 ```
 
-**Current Status:** Phase 1 ✅ Complete | **Next:** Phase 2 - Dashboard + Candidate Management
+**Current Status:** Phase 2 ✅ Complete | **Next:** Phase 3 - Screening Round Flow
 
 ---
 
@@ -64,6 +64,7 @@ Dart Shelf Server (backend, localhost:3001)
 6. **DataService abstraction.** All data access goes through an abstract class. LocalDataService talks to the shelf server. This enables Firebase migration later.
 7. **Data folder is outside the project.** Default: `~/intervue_data/`. Passed as `--data-dir` arg to the server.
 8. **All sample data from `sample_data/` folder gets copied into the data directory on first run** if the data directory is empty.
+9. **Browser navigation must work.** Use `context.push()` for forward navigation (e.g., dashboard → candidate detail) and `context.pop()` or back button text links for going back. This ensures browser back/forward buttons work correctly. Never use `context.go()` for hierarchical navigation — only for replacing the current route entirely (e.g., after logout).
 
 ---
 
@@ -160,40 +161,55 @@ flutter run -d chrome
 
 ---
 
-### Phase 2: Dashboard + Candidate Management
+### Phase 2: Dashboard + Candidate Management ✅ COMPLETE
 
 **Goal:** Kanban pipeline board works. Can add, view, and manage candidates.
 
-**Tasks:**
-1. Build the Dashboard screen (see WIREFRAMES.md — Dashboard):
-   - Pipeline columns: Screening → Technical → Assignment → Final Review
-   - Candidate cards with name, status badge, key info preview
-   - Card colors based on grade (strong/maybe/flagged)
-   - Counts per column
-   - Rejected and Hired summary at bottom
-   - Search bar that filters across all columns
-2. Build "Add Candidate" flow:
-   - Slide-over panel (not a new page)
-   - Fields: name, email, phone, resume upload
-   - Resume uploads via multipart POST to server, stored in candidate folder
-3. Build Candidate Detail screen (see WIREFRAMES.md — Candidate Detail):
+**Status:** ✅ Completed on 2026-03-02
+
+**What Was Built:**
+
+1. **Widgets** (`lib/widgets/`):
+   - `status_badge.dart` — Colored status pill badges
+   - `grade_indicator.dart` — Strong/Maybe/No grade indicator
+   - `save_indicator.dart` — Global save status in top bar
+   - `search_bar.dart` — Search input for filtering candidates
+   - `candidate_card.dart` — Pipeline cards with stage-specific content
+   - `pipeline_column.dart` — Scrollable column for each pipeline stage
+   - `add_candidate_panel.dart` — Slide-over panel for adding candidates with resume upload
+   - `status_dropdown.dart` — Status change dropdown with all statuses
+   - `reject_dialog.dart` — Rejection dialog with preset reasons + custom text
+
+2. **Dashboard Screen** (`lib/screens/dashboard/dashboard_screen.dart`):
+   - Four pipeline columns: Screening, Technical, Assignment, Final Review
+   - Candidate cards with stage-specific info (grade, score, status)
+   - Search bar filters across all columns
+   - Rejected/Hired summary at bottom
+   - "Add Candidate" button opens slide-over panel
+   - "Compare Finalists" link
+
+3. **Candidate Detail Screen** (`lib/screens/candidate/candidate_detail_screen.dart`):
+   - Header with name, email, phone, resume link
+   - Status dropdown for changing candidate status
    - Tabbed layout: Profile | Screening | Technical | Assignment
-   - Profile tab: contact info, CTC, notice period, status, resume link
-   - Resume opens in new browser tab via server URL
-   - Status dropdown with all CandidateStatus values
-   - Status changes auto-save and update the dashboard
-4. Implement candidate status transitions with timestamp logging
-5. "Reject" action with reason selector (preset options + custom text)
-6. Implement drag-and-drop between pipeline columns OR status dropdown on cards (your choice — dropdown is simpler and less buggy in Flutter web)
+   - Profile tab fully implemented with contact, compensation, availability, timeline
+
+4. **Tabs** (`lib/screens/candidate/tabs/`):
+   - `profile_tab.dart` — Full implementation with reject button
+   - `screening_tab.dart` — Placeholder for Phase 3
+   - `technical_tab.dart` — Placeholder for Phase 4
+   - `assignment_tab.dart` — Placeholder for Phase 5
 
 **Acceptance Criteria:**
-- [ ] Dashboard shows sample candidates in correct pipeline columns
-- [ ] Search filters candidates by name across all columns
-- [ ] Can add a new candidate with name, email, phone, resume
-- [ ] Candidate detail view shows all profile information
-- [ ] Resume PDF opens in a new browser tab
-- [ ] Status changes persist across page refreshes
-- [ ] Rejecting a candidate moves them to rejected pool with reason and timestamp
+- [x] Dashboard shows sample candidates in correct pipeline columns
+- [x] Search filters candidates by name across all columns
+- [x] Can add a new candidate with name, email, phone, resume
+- [x] Candidate detail view shows all profile information
+- [x] Resume PDF opens in a new browser tab
+- [x] Status changes persist across page refreshes
+- [x] Rejecting a candidate moves them to rejected pool with reason and timestamp
+
+**Known Issue (to fix):** Browser back/forward navigation — need to use `context.push()` instead of `context.go()` for proper history support. See Critical Rule #9.
 
 ---
 
