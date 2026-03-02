@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -154,31 +155,19 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
                 const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
-                    Icon(
-                      Icons.email_outlined,
-                      size: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      candidate.email,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    _buildCopyableInfo(
+                      context,
+                      icon: Icons.email_outlined,
+                      value: candidate.email,
+                      label: 'Email',
                     ),
                     if (candidate.phone != null) ...[
                       const SizedBox(width: AppSpacing.md),
-                      Icon(
-                        Icons.phone_outlined,
-                        size: 16,
-                        color: AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        candidate.phone!,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      _buildCopyableInfo(
+                        context,
+                        icon: Icons.phone_outlined,
+                        value: candidate.phone!,
+                        label: 'Phone',
                       ),
                     ],
                     if (candidate.resumePath != null) ...[
@@ -220,6 +209,47 @@ class _CandidateDetailScreenState extends ConsumerState<CandidateDetailScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCopyableInfo(
+    BuildContext context, {
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
+    return InkWell(
+      onTap: () async {
+        await Clipboard.setData(ClipboardData(text: value));
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$label copied to clipboard'),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      },
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: AppColors.textSecondary),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.copy, size: 12, color: AppColors.textTertiary),
+          ],
+        ),
       ),
     );
   }

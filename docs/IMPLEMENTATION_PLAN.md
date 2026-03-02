@@ -12,7 +12,7 @@ cd /Users/dan/Documents/intervue
 flutter run -d chrome
 ```
 
-**Current Status:** Phase 3 ✅ Complete | **Next:** Phase 4 - Question Bank + Interview Session
+**Current Status:** Phase 4 ✅ Complete | **Next:** Phase 5 - Assignment Round + Comparison View
 
 ---
 
@@ -266,51 +266,75 @@ flutter run -d chrome
 
 ---
 
-### Phase 4: Question Bank + Interview Session
+### Phase 4: Question Bank + Interview Session ✅ COMPLETE
 
 **Goal:** The live interview experience works — select questions, run the interview, score in real-time.
 
-**Tasks:**
-1. Build Question Bank screen (see WIREFRAMES.md — Question Bank):
+**Status:** ✅ Completed on 2026-03-02
+
+**What Was Built:**
+
+1. **Widgets** (`lib/widgets/`):
+   - `collapsible_section.dart` — Animated collapsible sections for grouping questions
+
+2. **Question Bank Screen** (`lib/screens/interview/question_bank_screen.dart`):
    - All questions from technical.json and general.json displayed
    - Grouped by category with collapsible sections
-   - Each question shows: question text, "Assesses" tag, depth badge (Core/Nice-to-have)
+   - Each question shows: question text, "Assesses" tag, depth badge (Core/Nice-to-have/General)
    - Checkbox to select questions for an interview
-   - Filter by: category, depth, tags
+   - Filter by depth: All, Core, Nice-to-have, General
    - "Start Interview with N Selected" button → navigates to interview session
-2. Build the Technical Interview Session screen (see WIREFRAMES.md — Interview Session):
-   - **This is the most critical screen. Get it right.**
-   - Top bar: candidate name, timer (auto-starts), question counter (Q3 of 7)
+   - Clear selection button
+
+3. **Interview Session Screen** (`lib/screens/interview/interview_session_screen.dart`):
+   - Top bar: candidate name, live timer (auto-starts), question counter (Q 3 of 6)
    - Question card: full question text, category badge
-   - Fraud probe: collapsed by default, tap "Show Probe" to reveal, tap again to hide
-   - Score selector: 5 tappable circles (1-5), highlighted on selection
-   - Fraud flag: 3 tappable dots — green (none), yellow (some concern), red (strong suspicion)
-   - Response quality quick chips: "Detailed + specific" / "Correct but textbook" / "Vague" / "Incorrect" / "No answer"
-   - Notes text area: free text, auto-save on every keystroke (debounced 500ms)
-   - Navigation: Previous / Next buttons, also keyboard arrows
-   - "Skip Question" — marks as skipped, moves to next
-   - "Finish Round" — shows summary with all scores, overall recommendation selector
-3. Post-interview summary screen:
+   - Fraud probe: collapsed by default, "Show Fraud Probe" toggles visibility with animation
+   - Score selector: 5 tappable circles (1-5), color-coded
+   - Fraud flag: 3 tappable options — None (green), Concern (yellow), Suspect (red)
+   - Response quality quick chips: Detailed / Textbook / Vague / Wrong / No answer
+   - Notes text area with auto-save
+   - Navigation: Previous / Next buttons + keyboard arrow keys
+   - Keyboard shortcuts: 1-5 for scoring, arrow keys for navigation
+   - Skip Question button
+   - Finish Round button → navigates to summary
+
+4. **Interview Summary Screen** (`lib/screens/interview/interview_summary_screen.dart`):
    - Shows all questions with scores at a glance
-   - Overall impression ratings (Communication, Depth, Problem-Solving, Culture Fit) — each 1-5 tappable
-   - Red flags and green flags: text fields
-   - Fraud assessment: radio — "Genuine" / "Some doubt" / "High suspicion"
-   - Recommendation: Three large tappable cards — ADVANCE / HOLD / REJECT
-   - "Save & Return to Candidate" button
-4. The interview data saves to the candidate's `technical.json` file
-5. In Candidate Detail → Technical tab: show completed interview data in read-only view, with option to edit scores
+   - Average score calculation
+   - Overall impression ratings (Communication, Depth of Knowledge, Problem-Solving, Culture Fit)
+   - Red flags and green flags text fields
+   - Fraud assessment: Genuine / Some doubt / High suspicion
+   - Recommendation: ADVANCE / HOLD / REJECT tappable cards
+   - Save & Return to Candidate button — saves all data to server
+
+5. **Technical Tab** (`lib/screens/candidate/tabs/technical_tab.dart`):
+   - Shows "Start Technical Interview" button when no interview exists
+   - Displays completed interview data:
+     - Date, duration, recommendation badge
+     - Average score, question count, fraud flag count
+     - All question scores with notes and response quality
+     - Overall impressions with score visualization
+     - Red/green flags display
+     - Fraud assessment display
+   - "Run Another Interview" button
+
+**Also Fixed:**
+- Status badge colors updated per user requirements (New=yellow, Screening I-III=blues, Technical=orange, Assignment=magenta, In Review=cyan, Offered=green, Rejected=red, Hired=white)
+- Phone/email in candidate header now clickable to copy
+- Removed duplicate actions bar from profile tab (reject handled via status dropdown)
 
 **Acceptance Criteria:**
-- [ ] Can browse question bank, filter by category/depth
-- [ ] Can select questions and start an interview session
-- [ ] Interview screen shows one question at a time with all input widgets
-- [ ] Timer runs and displays elapsed time
-- [ ] Fraud probe is hidden by default, togglable
-- [ ] Scores and notes auto-save per question
-- [ ] Can navigate between questions with buttons and keyboard
-- [ ] Post-interview summary shows all scores and accepts overall ratings
-- [ ] Recommendation saves and reflects on dashboard
-- [ ] Completed interview is viewable in candidate's Technical tab
+- [x] Can browse question bank, filter by category/depth
+- [x] Can select questions and start an interview session
+- [x] Interview screen shows one question at a time with all input widgets
+- [x] Timer runs and displays elapsed time
+- [x] Fraud probe is hidden by default, togglable
+- [x] Scores and notes auto-save per question
+- [x] Can navigate between questions with buttons and keyboard
+- [x] Post-interview summary shows all scores and accepts overall ratings
+- [x] Recommendation saves and reflects on dashboard
+- [x] Completed interview is viewable in candidate's Technical tab
 
 ---
 

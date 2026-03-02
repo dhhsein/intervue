@@ -4,12 +4,9 @@ import 'package:intl/intl.dart';
 
 import '../../../models/candidate.dart';
 import '../../../models/screening_data.dart';
-import '../../../providers/candidates_provider.dart';
-import '../../../providers/save_status_provider.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
-import '../../../widgets/reject_dialog.dart';
 
 class ProfileTab extends ConsumerWidget {
   final CandidateDetail detail;
@@ -46,7 +43,6 @@ class ProfileTab extends ConsumerWidget {
                 title: 'Timeline',
                 child: _buildTimeline(candidate),
               ),
-              _buildRejectButton(context, ref, candidate),
             ],
           ),
         ),
@@ -298,77 +294,6 @@ class ProfileTab extends ConsumerWidget {
         return Icons.cancel_outlined;
       default:
         return Icons.circle_outlined;
-    }
-  }
-
-  Widget _buildRejectButton(
-    BuildContext context,
-    WidgetRef ref,
-    Candidate candidate,
-  ) {
-    if (candidate.status == CandidateStatus.rejected ||
-        candidate.status == CandidateStatus.hired) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Actions', style: AppTypography.titleSmall),
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
-            onPressed: () => _showRejectDialog(context, ref, candidate),
-            icon: const Icon(Icons.cancel_outlined),
-            label: const Text('Reject Candidate'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.error,
-              side: BorderSide(color: AppColors.error),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showRejectDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Candidate candidate,
-  ) {
-    showDialog(
-      context: context,
-      builder: (context) => RejectDialog(
-        candidateName: candidate.name,
-        onReject: (reason) => _rejectCandidate(ref, candidate, reason),
-      ),
-    );
-  }
-
-  Future<void> _rejectCandidate(
-    WidgetRef ref,
-    Candidate candidate,
-    String reason,
-  ) async {
-    ref.read(saveStatusProvider.notifier).setSaving();
-    try {
-      await ref.read(candidatesProvider.notifier).updateCandidate(
-        candidate.id,
-        {
-          'status': CandidateStatus.rejected.value,
-          'rejectionReason': reason,
-        },
-      );
-      ref.invalidate(candidateDetailProvider(candidate.id));
-      ref.read(saveStatusProvider.notifier).setSaved();
-    } catch (e) {
-      ref.read(saveStatusProvider.notifier).setError();
     }
   }
 }
