@@ -83,73 +83,110 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
   }
 
   Widget _buildHeader(ScreeningData screening, String candidateName) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Screening', style: AppTypography.titleLarge),
-              const SizedBox(height: AppSpacing.sm),
-              _buildDateRow(screening),
-            ],
-          ),
+        // Title row with grade badge
+        Row(
+          children: [
+            Expanded(
+              child: Text('Screening', style: AppTypography.titleLarge),
+            ),
+            _buildGradeBadge(screening.grade),
+          ],
         ),
-        _buildCopyEmailButton(candidateName),
+        const SizedBox(height: AppSpacing.md),
+        // Email prompt section
+        _buildEmailPrompt(screening, candidateName),
       ],
     );
   }
 
-  Widget _buildDateRow(ScreeningData screening) {
-    final pills = <Widget>[];
-    if (screening.emailSentAt != null) {
-      pills.add(_buildDatePill('Email sent', _dateFormat.format(screening.emailSentAt!)));
-    }
-    if (screening.responseReceivedAt != null) {
-      pills.add(_buildDatePill('Response', _dateFormat.format(screening.responseReceivedAt!)));
-    }
-    if (screening.phoneScreenAt != null) {
-      pills.add(_buildDatePill('Phone screen', _dateFormat.format(screening.phoneScreenAt!)));
-    }
-
-    if (pills.isEmpty) {
-      return Text(
-        'No screening activity yet',
-        style: AppTypography.bodySmall.copyWith(color: AppColors.textTertiary),
+  Widget _buildGradeBadge(ScreeningGrade? grade) {
+    if (grade == null) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.textTertiary.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.textTertiary),
+        ),
+        child: Text(
+          'NOT GRADED',
+          style: AppTypography.titleSmall.copyWith(color: AppColors.textTertiary),
+        ),
       );
     }
 
-    return Wrap(
-      spacing: AppSpacing.sm,
-      runSpacing: AppSpacing.xs,
-      children: pills,
-    );
-  }
+    Color color;
+    String label;
+    switch (grade) {
+      case ScreeningGrade.strong:
+        color = AppColors.success;
+        label = 'STRONG';
+        break;
+      case ScreeningGrade.maybe:
+        color = AppColors.warning;
+        label = 'MAYBE';
+        break;
+      case ScreeningGrade.no:
+        color = AppColors.error;
+        label = 'NO';
+        break;
+    }
 
-  Widget _buildDatePill(String label, String date) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.transparent,
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.surfaceBorder),
+        border: Border.all(color: color),
       ),
       child: Text(
-        '$label: $date',
-        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+        label,
+        style: AppTypography.titleSmall.copyWith(color: color),
       ),
     );
   }
 
-  Widget _buildCopyEmailButton(String candidateName) {
-    return TextButton.icon(
-      onPressed: () => _copyScreeningEmail(candidateName),
-      icon: const Icon(Icons.copy, size: 16),
-      label: const Text('Copy Screening Email'),
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.accent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  Widget _buildEmailPrompt(ScreeningData screening, String candidateName) {
+    final isSent = screening.emailSentAt != null;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.surfaceBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isSent ? Icons.check_circle_outline : Icons.mail_outline,
+            color: isSent ? AppColors.success : AppColors.textSecondary,
+            size: 20,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              isSent
+                  ? 'Email sent on ${_dateFormat.format(screening.emailSentAt!)}'
+                  : 'Screening email has not been sent yet',
+              style: AppTypography.bodyMedium.copyWith(
+                color: isSent ? AppColors.textPrimary : AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () => _copyScreeningEmail(candidateName),
+            icon: const Icon(Icons.copy, size: 16),
+            label: Text(isSent ? 'Copy Again' : 'Copy Email'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.accent,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+          ),
+        ],
       ),
     );
   }

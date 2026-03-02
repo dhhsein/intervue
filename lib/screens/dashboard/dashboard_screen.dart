@@ -11,6 +11,7 @@ import '../../widgets/add_candidate_panel.dart';
 import '../../widgets/pipeline_column.dart';
 import '../../widgets/save_indicator.dart';
 import '../../widgets/search_bar.dart';
+import '../../widgets/settings_dialog.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
@@ -100,8 +101,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           _buildCountBadge(hired.length, AppColors.success, 'Hired', hired),
           const SizedBox(width: AppSpacing.lg),
           const SaveIndicator(),
+          const SizedBox(width: AppSpacing.sm),
+          IconButton(
+            onPressed: () => _showSettingsDialog(),
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Settings',
+            color: AppColors.textSecondary,
+          ),
         ],
       ),
+    );
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const SettingsDialog(),
     );
   }
 

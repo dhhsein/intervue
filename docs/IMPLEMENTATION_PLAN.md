@@ -12,7 +12,7 @@ cd /Users/dan/Documents/intervue
 flutter run -d chrome
 ```
 
-**Current Status:** Phase 4 ✅ Complete | **Next:** Phase 5 - Assignment Round + Comparison View
+**Current Status:** Phase 5 ✅ Complete | **Next:** Phase 6 - Polish + Quality of Life
 
 ---
 
@@ -338,49 +338,61 @@ flutter run -d chrome
 
 ---
 
-### Phase 5: Assignment Round + Comparison View
+### Phase 5: Assignment Round + Comparison View ✅ COMPLETE
 
 **Goal:** Full assignment review flow and side-by-side candidate comparison.
 
-**Tasks:**
-1. Build Assignment tab in Candidate Detail (see WIREFRAMES.md — Assignment Review):
-   - Assignment status: "Not sent" / "Sent" / "Submitted" / "Reviewed"
-   - "Mark as Sent" button with date picker
-   - Submission details: repo link (text field), on-time toggle, submission date
-   - Five scoring areas, each with:
-     - Area name and weight shown
-     - Score: 1-5 tappable circles
-     - Notes: text field
-   - Auto-calculated weighted score displayed prominently
-   - Git history check: commit pattern radio ("Incremental" / "1-2 bulk commits" / "Single commit"), suspicious toggle
-   - Review call notes: text area
-   - Fraud assessment: same as technical round
-   - Recommendation: HIRE / HOLD / REJECT tappable cards
-2. Build Comparison View screen (see WIREFRAMES.md — Comparison):
-   - Select 2-4 candidates from a list (only those in Assignment or Final Review stage)
-   - Side-by-side table showing:
-     - Technical round average score
-     - Assignment weighted score
-     - Individual dimension scores (communication, depth, etc.)
-     - Fraud flags count
-     - CTC expected
-     - Notice period
-     - Overall recommendation from each round
-   - Highlight the highest score in each row
-   - "View Details" link for each candidate
-3. Build a simple export function:
-   - "Export Summary" button on comparison view
-   - Generates a JSON file with all compared candidates' data
-   - Downloads via browser
+**Status:** ✅ Completed on 2026-03-02
+
+**What Was Built:**
+
+1. **Assignment Provider** (`lib/providers/assignment_provider.dart`):
+   - `AssignmentReviewNotifier` for state management with auto-save
+   - Default scoring areas with weights (Code Quality 25%, Correctness 25%, Testing 20%, API Design 15%, DevOps 15%)
+   - Methods for updating: status, dates, area scores, git check, fraud assessment, recommendation
+
+2. **Assignment Tab** (`lib/screens/candidate/tabs/assignment_tab.dart`):
+   - Header with status badge (Not Sent / Sent / Submitted / Reviewed)
+   - Timeline section with date pickers for Sent, Due, and Submitted dates
+   - On-time status toggle
+   - Submission section with repo link input and copy/open buttons
+   - Five scoring areas with:
+     - Area name and weight badge (percentage)
+     - ScoreSelector (1-5 tappable circles)
+     - AutoSaveTextField for notes
+   - Weighted score card showing calculated score prominently
+   - Git history check section with commit pattern chips (Incremental / Bulk / Single) and suspicious toggle
+   - Review call notes text area
+   - Fraud assessment with three level buttons (Genuine / Some doubt / High suspicion)
+   - Recommendation section with GradeSelector (HIRE / HOLD / REJECT cards)
+
+3. **Compare Screen** (`lib/screens/compare/compare_screen.dart`):
+   - Candidate selection view showing only Assignment/Final Review/Offer stage candidates
+   - Checkbox selection UI (2-4 candidates limit)
+   - Side-by-side comparison table with rows for:
+     - Status
+     - Technical Score (highlighted max)
+     - Assignment Score (highlighted max)
+     - Communication, Depth of Knowledge, Problem Solving, Culture Fit (all highlighted max)
+     - Fraud Flags (highlighted min)
+     - Expected CTC, Notice Period
+     - Tech Recommendation, Assignment Recommendation (color-coded)
+   - "View Details →" links to navigate to candidate detail pages
+   - "Change Selection" button to go back to selection view
+
+4. **Export Functionality**:
+   - "Export Summary" button in comparison view app bar
+   - Generates JSON file with all candidate details and metrics
+   - Downloads via browser with timestamp in filename
 
 **Acceptance Criteria:**
-- [ ] Assignment tab shows all scoring areas with weights
-- [ ] Weighted score auto-calculates as scores are entered
-- [ ] Git history and fraud assessment inputs work
-- [ ] Recommendation saves and reflects on dashboard
-- [ ] Comparison view shows 2-4 candidates side by side
-- [ ] Highest scores are visually highlighted
-- [ ] Export generates a downloadable JSON summary
+- [x] Assignment tab shows all scoring areas with weights
+- [x] Weighted score auto-calculates as scores are entered
+- [x] Git history and fraud assessment inputs work
+- [x] Recommendation saves and reflects on dashboard
+- [x] Comparison view shows 2-4 candidates side by side
+- [x] Highest scores are visually highlighted
+- [x] Export generates a downloadable JSON summary
 
 ---
 
@@ -393,6 +405,7 @@ flutter run -d chrome
 2. Implement keyboard shortcuts:
    - In interview session: `1-5` keys for score, `N` to focus notes, `→` next question, `←` previous
    - Global: `Cmd+K` or `/` for search
+   - Add a ? icon in the top corner of each page to show the list of supported shortcuts for that page
 3. Add toast notifications for actions (candidate added, status changed, email copied)
 4. Add empty states for all screens (no candidates yet, no interviews yet, etc.)
 5. Add loading states (skeleton cards on dashboard while data loads)

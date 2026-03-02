@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../models/assignment_review.dart';
 import '../../../models/candidate.dart';
 import '../../../models/screening_data.dart';
+import '../../../models/technical_round.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
@@ -27,6 +29,10 @@ class ProfileTab extends ConsumerWidget {
             spacing: AppSpacing.lg,
             runSpacing: AppSpacing.lg,
             children: [
+              _buildSectionCard(
+                title: 'Interview Summary',
+                child: _buildInterviewSummary(),
+              ),
               _buildSectionCard(
                 title: 'Contact',
                 child: _buildContactInfo(candidate),
@@ -74,6 +80,168 @@ class ProfileTab extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildInterviewSummary() {
+    final screening = detail.screening;
+    final technical = detail.technical;
+    final assignment = detail.assignment;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _buildRoundSummary(
+            icon: Icons.assignment_outlined,
+            title: 'Screening',
+            result: _getScreeningResult(screening),
+            color: _getScreeningColor(screening?.grade),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: _buildRoundSummary(
+            icon: Icons.code,
+            title: 'Technical',
+            result: _getTechnicalResult(technical),
+            color: _getTechnicalColor(technical?.recommendation),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: _buildRoundSummary(
+            icon: Icons.folder_outlined,
+            title: 'Assignment',
+            result: _getAssignmentResult(assignment),
+            subtitle: assignment?.weightedScore != null
+                ? '${assignment!.weightedScore.toStringAsFixed(1)}/5'
+                : null,
+            color: _getAssignmentColor(assignment?.recommendation),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRoundSummary({
+    required IconData icon,
+    required String title,
+    required String result,
+    required Color color,
+    String? subtitle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            title,
+            style: AppTypography.label.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            result,
+            style: AppTypography.titleSmall.copyWith(color: color),
+            textAlign: TextAlign.center,
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              subtitle,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _getScreeningResult(ScreeningData? screening) {
+    if (screening?.grade == null) return 'Pending';
+    switch (screening!.grade!) {
+      case ScreeningGrade.strong:
+        return 'Strong';
+      case ScreeningGrade.maybe:
+        return 'Maybe';
+      case ScreeningGrade.no:
+        return 'No';
+    }
+  }
+
+  Color _getScreeningColor(ScreeningGrade? grade) {
+    if (grade == null) return AppColors.textTertiary;
+    switch (grade) {
+      case ScreeningGrade.strong:
+        return AppColors.success;
+      case ScreeningGrade.maybe:
+        return AppColors.warning;
+      case ScreeningGrade.no:
+        return AppColors.error;
+    }
+  }
+
+  String _getTechnicalResult(TechnicalRound? technical) {
+    if (technical?.recommendation == null) return 'Pending';
+    switch (technical!.recommendation!) {
+      case 'advance':
+        return 'Advance';
+      case 'hold':
+        return 'Hold';
+      case 'reject':
+        return 'Reject';
+      default:
+        return technical.recommendation!;
+    }
+  }
+
+  Color _getTechnicalColor(String? recommendation) {
+    if (recommendation == null) return AppColors.textTertiary;
+    switch (recommendation) {
+      case 'advance':
+        return AppColors.success;
+      case 'hold':
+        return AppColors.warning;
+      case 'reject':
+        return AppColors.error;
+      default:
+        return AppColors.textTertiary;
+    }
+  }
+
+  String _getAssignmentResult(AssignmentReview? assignment) {
+    if (assignment?.recommendation == null) return 'Pending';
+    switch (assignment!.recommendation!) {
+      case 'hire':
+        return 'Hire';
+      case 'hold':
+        return 'Hold';
+      case 'reject':
+        return 'Reject';
+      default:
+        return assignment.recommendation!;
+    }
+  }
+
+  Color _getAssignmentColor(String? recommendation) {
+    if (recommendation == null) return AppColors.textTertiary;
+    switch (recommendation) {
+      case 'hire':
+        return AppColors.success;
+      case 'hold':
+        return AppColors.warning;
+      case 'reject':
+        return AppColors.error;
+      default:
+        return AppColors.textTertiary;
+    }
   }
 
   Widget _buildContactInfo(Candidate candidate) {
