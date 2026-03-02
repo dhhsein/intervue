@@ -1,5 +1,21 @@
 # InterVue — Implementation Plan
 
+## Quick Start (for continuing implementation)
+
+```bash
+# Terminal 1: Start the server
+cd /Users/dan/Documents/intervue/server
+dart run bin/server.dart --data-dir ~/intervue_data
+
+# Terminal 2: Run Flutter web
+cd /Users/dan/Documents/intervue
+flutter run -d chrome
+```
+
+**Current Status:** Phase 1 ✅ Complete | **Next:** Phase 2 - Dashboard + Candidate Management
+
+---
+
 ## What Is This
 
 InterVue is a Flutter web app for managing interview pipelines. It runs locally with a Dart shelf server for file I/O. Dark theme only, minimal UI, optimized for speed during live interviews.
@@ -57,36 +73,90 @@ Each phase is scoped to be completable in a single Claude Code session. After co
 
 ---
 
-### Phase 1: Project Scaffold + Server + Data Layer
+### Phase 1: Project Scaffold + Server + Data Layer ✅ COMPLETE
 
 **Goal:** Flutter web project runs, Dart server runs, data flows end-to-end, sample data loads.
 
-**Tasks:**
-1. Create Flutter web project: `flutter create --platforms web intervue`
-2. Set up `pubspec.yaml` with all dependencies (see Tech Stack)
-3. Create the Dart shelf server in `server/` directory:
-   - CORS middleware (see GOTCHAS.md — this must be first)
-   - All CRUD endpoints from API_SPEC.md
-   - File serving for resumes (PDFs)
-   - `--data-dir` command-line argument with default `~/intervue_data/`
-   - First-run detection: if data dir is empty, copy sample data into it
-4. Implement all data models from DATA_MODELS.md with `json_serializable`
-5. Create `DataService` abstract class and `LocalDataService` implementation
-6. Create Riverpod providers for candidates and questions
-7. Set up `go_router` with route definitions for all screens (screens can be placeholder `Scaffold` widgets)
-8. Set up the theme from DESIGN_SYSTEM.md (colors, typography, dark theme)
-9. Create `start.sh` script that launches both server and Flutter web
-10. Verify: app launches, server responds, sample data loads, no CORS errors
+**Status:** ✅ Completed on 2026-03-02
+
+**What Was Built:**
+
+1. **Server** (`server/bin/server.dart` ~400 lines):
+   - CORS middleware as FIRST in pipeline
+   - All CRUD endpoints: candidates, screening, technical, assignment
+   - Questions endpoint for all three banks (screening, technical, general)
+   - Resume upload and file serving with path traversal protection
+   - Config endpoint
+   - `--data-dir` flag with default `~/intervue_data/`
+   - Auto-copies `sample_data/` on first run
+
+2. **Data Models** (`lib/models/`):
+   - `candidate.dart` - Candidate, CandidateStatus, StatusChange, CandidateDetail, PipelineStage
+   - `screening_data.dart` - ScreeningData, ScreeningGrade, ScreeningResponse, PhoneScreenData
+   - `technical_round.dart` - TechnicalRound, QuestionScore, FraudFlag, OverallImpressions, FraudAssessment
+   - `assignment_review.dart` - AssignmentReview, AssignmentStatus, AreaScore, GitHistoryCheck
+   - `interview_question.dart` - InterviewQuestion, QuestionBank
+   - `app_config.dart` - AppConfig
+   - All with generated `.g.dart` files from json_serializable
+
+3. **Services** (`lib/services/`):
+   - `data_service.dart` - Abstract DataService interface
+   - `local_data_service.dart` - Implementation using Dio to localhost:3001
+
+4. **Providers** (`lib/providers/`):
+   - `data_service_provider.dart` - DataService singleton
+   - `candidates_provider.dart` - CandidatesNotifier, candidateDetailProvider, filteredCandidatesProvider, candidatesByStageProvider
+   - `questions_provider.dart` - screeningQuestionsProvider, technicalQuestionsProvider, generalQuestionsProvider, questionsByCategoryProvider
+   - `interview_provider.dart` - InterviewSession, InterviewNotifier, selectedQuestionsProvider
+   - `save_status_provider.dart` - SaveStatus enum, SaveStatusNotifier
+
+5. **Theme** (`lib/theme/`):
+   - `app_colors.dart` - All colors from DESIGN_SYSTEM.md including score colors
+   - `app_typography.dart` - Hanuman for titles, Jost for body
+   - `app_spacing.dart` - 4px grid system
+   - `app_theme.dart` - Full dark ThemeData with Material 3
+
+6. **Router** (`lib/router/app_router.dart`):
+   - Routes: `/`, `/candidate/:id`, `/candidate/:id/questions`, `/candidate/:id/interview`, `/candidate/:id/interview/summary`, `/compare`
+
+7. **Placeholder Screens** (`lib/screens/`):
+   - `dashboard/dashboard_screen.dart`
+   - `candidate/candidate_detail_screen.dart`
+   - `interview/question_bank_screen.dart`
+   - `interview/interview_session_screen.dart`
+   - `interview/interview_summary_screen.dart`
+   - `compare/compare_screen.dart`
+
+8. **Sample Data** (`sample_data/`):
+   - `config.json` - App configuration with email templates
+   - `questions/screening.json` - 10 screening questions with input types
+   - `questions/technical.json` - 14 technical questions with fraud probes
+   - `questions/general.json` - 12 general questions
+   - `candidates/c_001_arjun_mehta/` - Status: technical, grade: strong
+   - `candidates/c_002_priya_sharma/` - Status: screening_done, grade: maybe
+   - `candidates/c_003_rahul_iyer/` - Status: assignment, has technical round data
+
+9. **Scripts**:
+   - `start.sh` - Launches server and Flutter web together
 
 **Acceptance Criteria:**
-- [ ] `dart run bin/server.dart` starts without errors on port 3001
-- [ ] `flutter run -d chrome` opens the app without errors
-- [ ] `GET localhost:3001/api/candidates` returns sample candidate JSON
-- [ ] `GET localhost:3001/api/questions/technical` returns question bank JSON
-- [ ] No CORS errors in browser console
-- [ ] Theme applies correctly (dark background, Crimson accent, Jost font)
-- [ ] All routes navigate without errors (even if screens are empty)
-- [ ] `start.sh` launches both server and app
+- [x] `dart run bin/server.dart` starts without errors on port 3001
+- [x] `flutter run -d chrome` opens the app without errors
+- [x] `GET localhost:3001/api/candidates` returns sample candidate JSON
+- [x] `GET localhost:3001/api/questions/technical` returns question bank JSON
+- [x] No CORS errors in browser console
+- [x] Theme applies correctly (dark background, Crimson accent, Jost font)
+- [x] All routes navigate without errors (even if screens are empty)
+- [x] `start.sh` launches both server and app
+
+**To Start Fresh Session for Phase 2:**
+```bash
+# Terminal 1: Start server
+cd server && dart run bin/server.dart --data-dir ~/intervue_data
+
+# Terminal 2: Run Flutter web
+flutter run -d chrome
+```
 
 ---
 
