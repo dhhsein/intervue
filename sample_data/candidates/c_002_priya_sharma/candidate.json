@@ -1,0 +1,76 @@
+{
+  "candidate": {
+    "id": "c_002_priya_sharma",
+    "name": "Priya Sharma",
+    "email": "priya.sharma@email.com",
+    "phone": "+91-87654-32109",
+    "resumePath": null,
+    "status": "screening_done",
+    "createdAt": "2025-03-01T10:00:00Z",
+    "updatedAt": "2025-03-03T09:15:00Z",
+    "rejectionReason": null,
+    "timeline": [
+      {"from": "new", "to": "screening_sent", "at": "2025-03-01T10:05:00Z", "note": "Screening email sent"},
+      {"from": "screening_sent", "to": "screening_done", "at": "2025-03-03T09:15:00Z", "note": "Response received — maybe"}
+    ]
+  },
+  "screening": {
+    "emailSentAt": "2025-03-01T10:05:00Z",
+    "responseReceivedAt": "2025-03-03T09:15:00Z",
+    "phoneScreenAt": null,
+    "grade": "maybe",
+    "responses": {
+      "screening_01": {
+        "questionId": "screening_01",
+        "selectedOption": "Open but passive"
+      },
+      "screening_02": {
+        "questionId": "screening_02",
+        "selectedOption": "Will relocate"
+      },
+      "screening_03": {
+        "questionId": "screening_03",
+        "numericValue": "15",
+        "numericValue2": "22"
+      },
+      "screening_04": {
+        "questionId": "screening_04",
+        "selectedOption": "No offers"
+      },
+      "screening_05": {
+        "questionId": "screening_05",
+        "selectedOptions": ["Better compensation", "Growth opportunities"]
+      },
+      "screening_06": {
+        "questionId": "screening_06",
+        "selectedOption": "Partial match — interested but some gaps"
+      },
+      "screening_07": {
+        "questionId": "screening_07",
+        "selectedOption": "Somewhat comfortable"
+      },
+      "screening_08": {
+        "questionId": "screening_08",
+        "numericValue": "60",
+        "selectedOption": "Negotiable"
+      },
+      "screening_09": {
+        "questionId": "screening_09",
+        "techLevels": {
+          "FastAPI": "Intermediate",
+          "SQLAlchemy": "Advanced",
+          "Docker": "Advanced",
+          "Kubernetes": "Intermediate",
+          "Terraform": "Basic"
+        }
+      },
+      "screening_10": {
+        "questionId": "screening_10",
+        "textValue": "Wanted to know about growth path and if they sponsor conferences"
+      }
+    },
+    "phoneScreen": null
+  },
+  "technical": null,
+  "assignment": null
+}

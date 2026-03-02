@@ -1,0 +1,86 @@
+{
+  "candidate": {
+    "id": "c_001_arjun_mehta",
+    "name": "Arjun Mehta",
+    "email": "arjun.mehta@email.com",
+    "phone": "+91-98765-43210",
+    "resumePath": null,
+    "status": "technical",
+    "createdAt": "2025-03-01T10:00:00Z",
+    "updatedAt": "2025-03-06T14:30:00Z",
+    "rejectionReason": null,
+    "timeline": [
+      {"from": "new", "to": "screening_sent", "at": "2025-03-01T10:05:00Z", "note": "Screening email sent"},
+      {"from": "screening_sent", "to": "screening_done", "at": "2025-03-02T16:20:00Z", "note": "Response received — strong"},
+      {"from": "screening_done", "to": "phone_screen", "at": "2025-03-03T11:00:00Z", "note": "Phone screen scheduled"},
+      {"from": "phone_screen", "to": "technical", "at": "2025-03-04T12:00:00Z", "note": "Advanced to technical round"}
+    ]
+  },
+  "screening": {
+    "emailSentAt": "2025-03-01T10:05:00Z",
+    "responseReceivedAt": "2025-03-02T16:20:00Z",
+    "phoneScreenAt": "2025-03-03T11:00:00Z",
+    "grade": "strong",
+    "responses": {
+      "screening_01": {
+        "questionId": "screening_01",
+        "selectedOption": "Yes, actively looking"
+      },
+      "screening_02": {
+        "questionId": "screening_02",
+        "selectedOption": "Already in Chennai"
+      },
+      "screening_03": {
+        "questionId": "screening_03",
+        "numericValue": "12",
+        "numericValue2": "18"
+      },
+      "screening_04": {
+        "questionId": "screening_04",
+        "selectedOption": "Has offer, unlikely to take"
+      },
+      "screening_05": {
+        "questionId": "screening_05",
+        "selectedOptions": ["Growth opportunities", "Domain interest"]
+      },
+      "screening_06": {
+        "questionId": "screening_06",
+        "selectedOption": "Strong match — this is exactly what I want",
+        "notes": "Mentioned specific interest in sports tech and AI integration"
+      },
+      "screening_07": {
+        "questionId": "screening_07",
+        "selectedOption": "Very comfortable — prefer this"
+      },
+      "screening_08": {
+        "questionId": "screening_08",
+        "numericValue": "30",
+        "selectedOption": "Negotiable"
+      },
+      "screening_09": {
+        "questionId": "screening_09",
+        "techLevels": {
+          "FastAPI": "Advanced",
+          "SQLAlchemy": "Intermediate",
+          "Docker": "Intermediate",
+          "Kubernetes": "Basic",
+          "Terraform": "None"
+        }
+      },
+      "screening_10": {
+        "questionId": "screening_10",
+        "textValue": "Asked about team size, tech debt, and whether there's a dedicated DevOps person"
+      }
+    },
+    "phoneScreen": {
+      "conducted": true,
+      "communicationScore": 4,
+      "salaryConfirmed": true,
+      "noticeConfirmed": true,
+      "onsiteConfirmed": true,
+      "notes": "Clear communicator. Explained his FastAPI experience confidently. Built auth system at previous startup. Seemed genuinely excited about sports tech."
+    }
+  },
+  "technical": null,
+  "assignment": null
+}

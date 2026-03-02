@@ -1,0 +1,112 @@
+{
+  "questions": [
+    {
+      "id": "general_01",
+      "category": "Debugging & Incident Response",
+      "question": "A critical API endpoint that was working fine yesterday is now returning 500 errors. No code was deployed. Walk me through your debugging process.",
+      "assesses": "Systematic debugging, root cause analysis, production awareness",
+      "depth": "general",
+      "tags": ["debugging", "incident-response", "production"],
+      "bank": "general"
+    },
+    {
+      "id": "general_02",
+      "category": "Product Thinking",
+      "question": "You are given a feature request that is vaguely defined: 'Make the coaching messages smarter.' How do you go from this to a shipped feature?",
+      "assesses": "Ambiguity handling, requirements gathering, breaking down problems",
+      "depth": "general",
+      "tags": ["product-thinking", "communication", "ambiguity"],
+      "bank": "general"
+    },
+    {
+      "id": "general_03",
+      "category": "Performance",
+      "question": "A database query that ran fine when there were 1,000 users is now taking 30 seconds with 100,000 users. How do you approach this?",
+      "assesses": "Performance debugging, database optimization thinking, scalability awareness",
+      "depth": "general",
+      "tags": ["performance", "database", "scalability"],
+      "bank": "general"
+    },
+    {
+      "id": "general_04",
+      "category": "Incident Response",
+      "question": "You discover a security vulnerability in production at 11 PM on a Friday. What do you do?",
+      "assesses": "Incident response, prioritization under pressure, communication judgment",
+      "depth": "general",
+      "tags": ["security", "incident-response", "judgment"],
+      "bank": "general"
+    },
+    {
+      "id": "general_05",
+      "category": "Integration & Resilience",
+      "question": "You need to integrate with a third-party API that has poor documentation and inconsistent responses. How do you approach building a reliable integration?",
+      "assesses": "Defensive programming, resilience patterns, real-world pragmatism",
+      "depth": "general",
+      "tags": ["integration", "resilience", "defensive-programming"],
+      "bank": "general"
+    },
+    {
+      "id": "general_06",
+      "category": "Decision Making",
+      "question": "Two team members disagree on whether to use a new framework for a critical service. One wants stability, the other wants modern tooling. You are the tiebreaker. How do you decide?",
+      "assesses": "Technical decision-making, trade-off analysis, team dynamics",
+      "depth": "general",
+      "tags": ["decision-making", "collaboration", "trade-offs"],
+      "bank": "general"
+    },
+    {
+      "id": "general_07",
+      "category": "Planning",
+      "question": "You are asked to estimate how long a feature will take. You genuinely have no idea because the codebase is new to you. How do you give a useful estimate?",
+      "assesses": "Estimation skills, honesty, structured decomposition",
+      "depth": "general",
+      "tags": ["planning", "estimation", "communication"],
+      "bank": "general"
+    },
+    {
+      "id": "general_08",
+      "category": "Debugging & Observability",
+      "question": "A background job that sends daily coaching nudges to 5,000 users is silently failing for 20% of users. Logs show no errors. How do you find the problem?",
+      "assesses": "Silent failure debugging, observability thinking, systematic investigation",
+      "depth": "general",
+      "tags": ["debugging", "observability", "background-jobs"],
+      "bank": "general"
+    },
+    {
+      "id": "general_09",
+      "category": "Deployment",
+      "question": "You wrote a feature, it works in staging, but fails in production. What are the most common reasons for this, and how do you systematically rule them out?",
+      "assesses": "Environment parity understanding, deployment awareness, systematic thinking",
+      "depth": "general",
+      "tags": ["debugging", "deployment", "staging-vs-production"],
+      "bank": "general"
+    },
+    {
+      "id": "general_10",
+      "category": "Collaboration",
+      "question": "You are reviewing a pull request from a senior developer. You think the approach is wrong. How do you handle it?",
+      "assesses": "Communication skills, code review maturity, professional courage",
+      "depth": "general",
+      "tags": ["collaboration", "communication", "code-review"],
+      "bank": "general"
+    },
+    {
+      "id": "general_11",
+      "category": "Engineering Judgment",
+      "question": "How do you decide when to refactor existing code vs. work around it? Give me a real example from your experience.",
+      "assesses": "Technical debt judgment, pragmatism, cost-benefit analysis",
+      "depth": "general",
+      "tags": ["technical-debt", "judgment", "pragmatism"],
+      "bank": "general"
+    },
+    {
+      "id": "general_12",
+      "category": "System Design",
+      "question": "You need to design a system that processes incoming webhook events. Some events must be processed in order, some can be processed in parallel. How do you architect this?",
+      "assesses": "System design, concurrency thinking, ordering guarantees",
+      "depth": "general",
+      "tags": ["system-design", "architecture", "concurrency"],
+      "bank": "general"
+    }
+  ]
+}

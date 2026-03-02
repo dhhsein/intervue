@@ -1,0 +1,10 @@
+{
+  "interviewerName": "Your Name",
+  "companyName": "Acrophase",
+  "roleName": "Python Backend Engineer",
+  "location": "IIT Madras Campus, Chennai",
+  "emailTemplate": "Hi {name},\n\nThank you for your interest in the Python Backend Engineer role at Acrophase. We're a center of excellence for sports technology based at IIT Madras, Chennai, building AI-powered platforms for personalized training and health tracking.\n\nBefore we move to the interview rounds, we'd like to understand your situation and alignment with this role. Please take 10-15 minutes to respond to the questions below.\n\nWe'd appreciate your response within 48 hours.\n\n{questions}\n\nWe're looking for people who are genuinely excited about building things, comfortable with ambiguity, and eager to own their work end-to-end. Looking forward to hearing from you.\n\nBest,\n{interviewer}\n{company}",
+  "rejectionTemplate": "Hi {name},\n\nThank you for taking the time to respond to our screening questions for the Python Backend Engineer role.\n\nAfter careful review, we've decided to move forward with other candidates whose profiles are a closer fit for our current needs. This doesn't reflect on your abilities, and we encourage you to apply for future openings.\n\nWe wish you all the best.\n\nBest,\n{interviewer}\n{company}",
+  "assignmentBrief": "Build a small FastAPI service that:\n\n1. Accepts a webhook POST with a workout session payload (sample JSON provided).\n2. Validates the payload using Pydantic models.\n3. Stores the session in a PostgreSQL database using SQLAlchemy.\n4. Implements idempotency (duplicate webhooks should not create duplicate records).\n5. Exposes a GET endpoint to retrieve sessions for a given user with pagination.\n6. Includes a Dockerfile to run the service.\n7. Includes at least 3 meaningful tests.\n\nTime limit: 48 hours from receipt. Expected effort: 3-4 hours.",
+  "serverPort": 3001
+}

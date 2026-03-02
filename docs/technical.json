@@ -1,0 +1,144 @@
+{
+  "questions": [
+    {
+      "id": "tech_python_01",
+      "category": "Python Fundamentals & Design",
+      "question": "Walk me through how you would design a FastAPI endpoint that accepts a workout plan request, validates it against a user's profile, calls an LLM to generate the plan, and returns the result. What would the request/response models look like? How would you handle the LLM call timing out?",
+      "assesses": "System design thinking, Pydantic modeling, async patterns, error handling",
+      "fraudProbe": "Ask them to draw/write the Pydantic models on the spot. Follow up with: 'What if the LLM takes 45 seconds — how does that affect your FastAPI worker pool?' AI-generated answers will be generic; real experience shows in timeout strategy specifics.",
+      "depth": "core",
+      "tags": ["python", "fastapi", "system-design", "pydantic", "llm"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_python_02",
+      "category": "Python Fundamentals & Design",
+      "question": "Explain the difference between sync and async endpoints in FastAPI. When would you choose one over the other? Have you run into issues mixing sync and async code?",
+      "assesses": "Async/await understanding, event loop knowledge, practical debugging experience",
+      "fraudProbe": "Follow up: 'Tell me about a specific time you had a sync-in-async bug. What was the symptom and how did you find it?' Fabricated stories fall apart on specifics like error messages and debugging steps.",
+      "depth": "core",
+      "tags": ["python", "fastapi", "async", "debugging"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_python_03",
+      "category": "Python Fundamentals & Design",
+      "question": "You need to add a new field to an existing database table that already has 500K rows. Walk me through your migration strategy using dbmate or raw SQL DDL. What could go wrong?",
+      "assesses": "Migration management, production awareness, downtime considerations",
+      "fraudProbe": "Ask: 'Have you ever had a migration fail in production? What happened?' Then probe the recovery steps. Real failures have messy, specific stories.",
+      "depth": "core",
+      "tags": ["database", "migrations", "production", "sql"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_python_04",
+      "category": "Python Fundamentals & Design",
+      "question": "How do you approach writing SQLAlchemy queries for complex joins and aggregations? Show me how you would query all users who completed more than 80% of their workout plans in the last 30 days, including their average completion rate.",
+      "assesses": "ORM proficiency, SQL knowledge, query optimization awareness",
+      "fraudProbe": "Have them write it on paper/whiteboard. Then ask: 'How would you check if this query is performing well? What indexes would help?' Follow-ups expose whether they understand query plans.",
+      "depth": "core",
+      "tags": ["sqlalchemy", "sql", "database", "performance"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_auth_01",
+      "category": "Authentication & Security",
+      "question": "Our system uses Keycloak for internal APIs and Auth0 for mobile APIs, both issuing JWTs. How would you design a middleware that handles both? What happens when a token is expired but the user's session should still be valid?",
+      "assesses": "Auth architecture, JWT lifecycle, middleware design, security thinking",
+      "fraudProbe": "Ask: 'Have you implemented JWT validation from scratch before? What library did you use and what claims did you validate beyond expiry?' Drill into RS256 vs HS256 understanding. Real implementers know the JWKS endpoint dance.",
+      "depth": "core",
+      "tags": ["authentication", "jwt", "keycloak", "auth0", "security"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_auth_02",
+      "category": "Authentication & Security",
+      "question": "Explain how you would implement role-based access control for an API where certain endpoints are admin-only, some are coach-only, and some are user-accessible. How do you handle a user who has multiple roles?",
+      "assesses": "RBAC design, decorator/dependency patterns, authorization logic",
+      "fraudProbe": "Follow up: 'Show me the FastAPI dependency function you would write for this.' Then: 'What if a coach is also a user — how does your role check handle OR vs AND logic?' This sequence requires live reasoning, not recall.",
+      "depth": "core",
+      "tags": ["rbac", "authorization", "fastapi", "security"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_infra_01",
+      "category": "Infrastructure & Deployment",
+      "question": "You push a commit that passes CI, gets deployed to staging via Flux CD, and the pods start crash-looping. Walk me through your debugging process from the moment you see the alert.",
+      "assesses": "Production debugging, Kubernetes knowledge, incident response, systematic thinking",
+      "fraudProbe": "This is a scenario walk-through. Keep asking 'then what?' at each step. Real operators mention specific commands (kubectl logs, kubectl describe pod, checking resource limits). AI users give textbook answers without the muscle memory.",
+      "depth": "core",
+      "tags": ["kubernetes", "debugging", "deployment", "incident-response"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_infra_02",
+      "category": "Infrastructure & Deployment",
+      "question": "Explain the difference between a Kubernetes Deployment, a Job, and a CronJob. In our system, daily plan generation runs as a background task. Which would you use and why?",
+      "assesses": "K8s resource types, scheduling patterns, practical infrastructure choices",
+      "fraudProbe": "Follow up: 'What happens if the CronJob takes longer than expected and the next one triggers? How would you prevent overlap?' This tests operational thinking, not definition recall.",
+      "depth": "nice_to_have",
+      "tags": ["kubernetes", "infrastructure", "scheduling"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_infra_03",
+      "category": "Infrastructure & Deployment",
+      "question": "Our staging environment uses spot instances (t3a.nano) and production uses on-demand instances. Why might we make this choice? What are the risks of spot instances and how do you handle them?",
+      "assesses": "Cloud cost awareness, production reliability thinking, infrastructure trade-offs",
+      "fraudProbe": "Ask: 'Have you personally dealt with a spot instance interruption? What happened to the workload?' Real experience includes specific stories about pod rescheduling, graceful shutdown handling.",
+      "depth": "nice_to_have",
+      "tags": ["aws", "infrastructure", "cost-optimization"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_data_01",
+      "category": "Data & Integrations",
+      "question": "We receive wearable data from Fitbit, Apple Health, and Garmin via the Terra API through webhooks. How would you design the webhook handler to be reliable? What happens if Terra sends the same event twice?",
+      "assesses": "Webhook handling, idempotency, data integrity, integration design",
+      "fraudProbe": "Ask: 'How would you implement idempotency here? Be specific about where you store the dedup key and what races could occur.' Then: 'What if the webhook handler crashes after processing but before sending the 200 response?' These sequential failure scenarios require real reasoning.",
+      "depth": "core",
+      "tags": ["webhooks", "integrations", "idempotency", "data-integrity"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_data_02",
+      "category": "Data & Integrations",
+      "question": "You need to process a batch of 10,000 workout session records, calculate HRV metrics for each, generate a PDF report, and upload it to S3. How would you architect this? What are the bottlenecks?",
+      "assesses": "Batch processing design, performance awareness, resource management",
+      "fraudProbe": "Ask: 'Would you use Polars or Pandas for this? Why?' Then: 'What if memory runs out at record 7,000?' These choices reveal hands-on data processing experience.",
+      "depth": "core",
+      "tags": ["batch-processing", "performance", "data-processing", "s3"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_testing_01",
+      "category": "Testing & Code Quality",
+      "question": "How do you decide what to test in a backend service? Walk me through your testing strategy for a new endpoint that creates a subscription via Razorpay and updates the user's plan.",
+      "assesses": "Testing philosophy, mocking strategy, integration vs unit test judgment",
+      "fraudProbe": "Ask: 'How do you mock the Razorpay API call in your tests? What about the database?' Then: 'What is one thing you would NOT unit test in this flow?' Good engineers know where testing has diminishing returns.",
+      "depth": "core",
+      "tags": ["testing", "mocking", "testing-strategy"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_testing_02",
+      "category": "Testing & Code Quality",
+      "question": "You inherit a codebase with zero tests. You have time to add tests for 3 areas. How do you decide which 3?",
+      "assesses": "Prioritization, risk assessment, pragmatic engineering judgment",
+      "fraudProbe": "Ask: 'Have you actually been in this situation? What did you pick and why?' Then probe: 'Did your choice prevent any bugs later?' Real stories have specific outcomes.",
+      "depth": "core",
+      "tags": ["testing", "prioritization", "judgment"],
+      "bank": "technical"
+    },
+    {
+      "id": "tech_llm_01",
+      "category": "LLM Integration",
+      "question": "We use LangChain to orchestrate calls to Claude, GPT-4, and Groq for generating workout plans. How would you handle a scenario where Claude is down but GPT-4 is available? How do you ensure the output format stays consistent across providers?",
+      "assesses": "LLM orchestration, fallback strategies, output normalization, resilience",
+      "fraudProbe": "Ask: 'Have you worked with LangChain before? What was the most annoying thing about it?' Then: 'How would you validate that the LLM output actually matches your expected Pydantic schema?' Real LLM developers have war stories about malformed outputs.",
+      "depth": "nice_to_have",
+      "tags": ["llm", "langchain", "resilience", "ai"],
+      "bank": "technical"
+    }
+  ]
+}

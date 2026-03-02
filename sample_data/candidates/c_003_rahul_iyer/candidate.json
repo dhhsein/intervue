@@ -1,0 +1,150 @@
+{
+  "candidate": {
+    "id": "c_003_rahul_iyer",
+    "name": "Rahul Iyer",
+    "email": "rahul.iyer@email.com",
+    "phone": "+91-76543-21098",
+    "resumePath": null,
+    "status": "assignment",
+    "createdAt": "2025-03-01T10:00:00Z",
+    "updatedAt": "2025-03-08T16:45:00Z",
+    "rejectionReason": null,
+    "timeline": [
+      {"from": "new", "to": "screening_sent", "at": "2025-03-01T10:05:00Z", "note": "Screening email sent"},
+      {"from": "screening_sent", "to": "screening_done", "at": "2025-03-02T11:30:00Z", "note": "Response received — strong"},
+      {"from": "screening_done", "to": "phone_screen", "at": "2025-03-03T10:00:00Z", "note": "Phone screen done"},
+      {"from": "phone_screen", "to": "technical", "at": "2025-03-03T15:00:00Z", "note": "Advanced to technical"},
+      {"from": "technical", "to": "assignment", "at": "2025-03-07T17:00:00Z", "note": "Strong technical — advancing to assignment"}
+    ]
+  },
+  "screening": {
+    "emailSentAt": "2025-03-01T10:05:00Z",
+    "responseReceivedAt": "2025-03-02T11:30:00Z",
+    "phoneScreenAt": "2025-03-03T10:00:00Z",
+    "grade": "strong",
+    "responses": {
+      "screening_01": {"questionId": "screening_01", "selectedOption": "Yes, actively looking"},
+      "screening_02": {"questionId": "screening_02", "selectedOption": "Already in Chennai"},
+      "screening_03": {"questionId": "screening_03", "numericValue": "10", "numericValue2": "16"},
+      "screening_04": {"questionId": "screening_04", "selectedOption": "No offers"},
+      "screening_05": {"questionId": "screening_05", "selectedOptions": ["Domain interest", "Current role stagnant"]},
+      "screening_06": {"questionId": "screening_06", "selectedOption": "Strong match — this is exactly what I want"},
+      "screening_07": {"questionId": "screening_07", "selectedOption": "Very comfortable — prefer this"},
+      "screening_08": {"questionId": "screening_08", "numericValue": "30", "selectedOption": "Negotiable"},
+      "screening_09": {
+        "questionId": "screening_09",
+        "techLevels": {
+          "FastAPI": "Advanced",
+          "SQLAlchemy": "Advanced",
+          "Docker": "Intermediate",
+          "Kubernetes": "Basic",
+          "Terraform": "None"
+        }
+      },
+      "screening_10": {"questionId": "screening_10", "textValue": "Asked about the LLM integration architecture and how research algorithms get productionized"}
+    },
+    "phoneScreen": {
+      "conducted": true,
+      "communicationScore": 5,
+      "salaryConfirmed": true,
+      "noticeConfirmed": true,
+      "onsiteConfirmed": true,
+      "notes": "Excellent communicator. Very articulate about past projects. Currently at a health-tech startup, so domain overlap is strong."
+    }
+  },
+  "technical": {
+    "candidateId": "c_003_rahul_iyer",
+    "date": "2025-03-06T14:00:00Z",
+    "durationSeconds": 2820,
+    "completed": true,
+    "questions": [
+      {
+        "questionId": "tech_python_01",
+        "score": 4,
+        "fraudFlag": "none",
+        "responseQuality": "detailed",
+        "responseSummary": "Designed clear request/response Pydantic models. Suggested using background tasks for LLM calls with polling. Knew about FastAPI's BackgroundTasks.",
+        "notes": "Solid approach. Mentioned using httpx with timeout param. Knew about worker pool implications.",
+        "skipped": false
+      },
+      {
+        "questionId": "tech_python_02",
+        "score": 5,
+        "fraudFlag": "none",
+        "responseQuality": "detailed",
+        "responseSummary": "Clearly explained event loop blocking with sync code in async endpoints. Gave a real example of a sync DB call blocking the entire loop.",
+        "notes": "Had a real war story about sync ORM calls inside async handlers. Knew to use run_in_executor as a workaround.",
+        "skipped": false
+      },
+      {
+        "questionId": "tech_auth_01",
+        "score": 4,
+        "fraudFlag": "none",
+        "responseQuality": "detailed",
+        "responseSummary": "Proposed a middleware that checks the issuer claim to route to the right validator. Discussed JWKS endpoint caching.",
+        "notes": "Solid JWT knowledge. Mentioned RS256 without prompting. Slightly vague on refresh token rotation.",
+        "skipped": false
+      },
+      {
+        "questionId": "tech_data_01",
+        "score": 5,
+        "fraudFlag": "none",
+        "responseQuality": "detailed",
+        "responseSummary": "Described idempotency key stored in DB with unique constraint. Addressed the crash-after-process scenario — suggested processing and acking in a transaction.",
+        "notes": "Exceptional answer. Clearly has built webhook handlers before. Mentioned Terra API specifically which shows he researched us.",
+        "skipped": false
+      },
+      {
+        "questionId": "tech_testing_01",
+        "score": 3,
+        "fraudFlag": "none",
+        "responseQuality": "textbook",
+        "responseSummary": "Described standard unit/integration split. Knew to mock external APIs. Struggled a bit on what NOT to test.",
+        "notes": "Adequate but not deep. Testing is his weaker area. Would need mentoring here.",
+        "skipped": false
+      },
+      {
+        "questionId": "general_01",
+        "score": 4,
+        "fraudFlag": "none",
+        "responseQuality": "detailed",
+        "responseSummary": "Systematic approach: check monitoring, check recent infra changes, check DB connections, check external dependencies. Mentioned checking if certs expired.",
+        "notes": "Good systematic thinker. Mentioned real tools (Sentry, Grafana). The cert expiry angle was a nice practical touch.",
+        "skipped": false
+      }
+    ],
+    "impressions": {
+      "communication": 5,
+      "depthOfKnowledge": 4,
+      "problemSolving": 4,
+      "cultureFit": 5,
+      "redFlags": "Testing depth is below what I'd like for mid-level",
+      "greenFlags": "Excellent communicator. Domain overlap with health-tech. Researched our stack before the interview. Genuine enthusiasm."
+    },
+    "fraudAssessment": {
+      "level": "genuine",
+      "notes": "All answers felt authentic. Had specific stories and tool names. No suspicious pauses."
+    },
+    "recommendation": "advance"
+  },
+  "assignment": {
+    "candidateId": "c_003_rahul_iyer",
+    "sentAt": "2025-03-07T17:30:00Z",
+    "dueAt": "2025-03-09T17:30:00Z",
+    "submittedAt": null,
+    "onTime": false,
+    "repoLink": null,
+    "areaScores": {
+      "codeQuality": {"areaId": "codeQuality", "displayName": "Code Quality", "weight": 25, "score": null, "notes": null},
+      "correctness": {"areaId": "correctness", "displayName": "Correctness", "weight": 25, "score": null, "notes": null},
+      "testing": {"areaId": "testing", "displayName": "Testing", "weight": 20, "score": null, "notes": null},
+      "apiDesign": {"areaId": "apiDesign", "displayName": "API Design", "weight": 15, "score": null, "notes": null},
+      "devops": {"areaId": "devops", "displayName": "DevOps", "weight": 15, "score": null, "notes": null}
+    },
+    "gitCheck": null,
+    "reviewCallNotes": null,
+    "fraudAssessment": null,
+    "recommendation": null,
+    "assignmentStatus": "sent"
+  }
+}

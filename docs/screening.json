@@ -1,0 +1,116 @@
+{
+  "questions": [
+    {
+      "id": "screening_01",
+      "category": "Interest & Availability",
+      "question": "Are you currently open to and actively exploring new opportunities?",
+      "assesses": "Filters out passive candidates who applied casually",
+      "depth": "screening",
+      "tags": ["availability"],
+      "bank": "screening",
+      "inputType": "single_select",
+      "options": ["Yes, actively looking", "Open but passive", "Not sure"]
+    },
+    {
+      "id": "screening_02",
+      "category": "Logistics",
+      "question": "This is a full-time, on-site role at IIT Madras Campus, Chennai. Does this work for your current situation? Would relocation be needed?",
+      "assesses": "Hard filter — on-site is non-negotiable",
+      "depth": "screening",
+      "tags": ["location", "logistics"],
+      "bank": "screening",
+      "inputType": "single_select",
+      "options": ["Already in Chennai", "Will relocate", "Need to discuss", "Cannot relocate"]
+    },
+    {
+      "id": "screening_03",
+      "category": "Compensation",
+      "question": "What is your current CTC, and what are your salary expectations for this role?",
+      "assesses": "Budget alignment — prevents investing hours in mismatched candidates",
+      "depth": "screening",
+      "tags": ["compensation"],
+      "bank": "screening",
+      "inputType": "number_pair",
+      "options": ["Current CTC (LPA)", "Expected CTC (LPA)"]
+    },
+    {
+      "id": "screening_04",
+      "category": "Competing Offers",
+      "question": "Do you currently hold any competing offers or are you in advanced stages with other companies? If so, what are your timelines?",
+      "assesses": "Urgency calibration — helps prioritize candidates who might slip away",
+      "depth": "screening",
+      "tags": ["offers", "urgency"],
+      "bank": "screening",
+      "inputType": "single_select",
+      "options": ["No offers", "Has offer, likely to take", "Has offer, unlikely to take", "Multiple offers", "In advanced stages"]
+    },
+    {
+      "id": "screening_05",
+      "category": "Motivation",
+      "question": "What is driving your decision to switch from your current role?",
+      "assesses": "Motivation check — red flags: purely money-driven, running from problems",
+      "depth": "screening",
+      "tags": ["motivation"],
+      "bank": "screening",
+      "inputType": "multi_select",
+      "options": ["Growth opportunities", "Better compensation", "Domain interest", "Better team/culture", "Current role stagnant", "Location change", "Other"]
+    },
+    {
+      "id": "screening_06",
+      "category": "Role Alignment",
+      "question": "This role involves building backend systems for an AI-powered sports/fitness platform (Python, FastAPI, PostgreSQL, AWS/K8s). How does this align with the kind of work you want to do next?",
+      "assesses": "Role-fit signal — tests if they actually read the JD",
+      "depth": "screening",
+      "tags": ["alignment", "role-fit"],
+      "bank": "screening",
+      "inputType": "single_select",
+      "options": ["Strong match — this is exactly what I want", "Partial match — interested but some gaps", "Weak match — different from my goals"]
+    },
+    {
+      "id": "screening_07",
+      "category": "Culture Fit",
+      "question": "How comfortable are you working in a small team (5-10 people) where you would own features end-to-end, from design through deployment?",
+      "assesses": "Culture fit — mid-level candidates from large orgs may struggle with breadth",
+      "depth": "screening",
+      "tags": ["culture", "ownership"],
+      "bank": "screening",
+      "inputType": "single_select",
+      "options": ["Very comfortable — prefer this", "Somewhat comfortable", "Prefer larger teams with defined roles"]
+    },
+    {
+      "id": "screening_08",
+      "category": "Logistics",
+      "question": "What is your notice period, and is there any flexibility to negotiate it down?",
+      "assesses": "Availability planning — Indian notice periods can be 30-90 days",
+      "depth": "screening",
+      "tags": ["notice-period", "logistics"],
+      "bank": "screening",
+      "inputType": "number",
+      "options": ["Notice period in days", "Negotiable"]
+    },
+    {
+      "id": "screening_09",
+      "category": "Technical Background",
+      "question": "Have you worked with any of these specific technologies: FastAPI, SQLAlchemy, Docker, Kubernetes, Terraform? Briefly mention your level of hands-on experience.",
+      "assesses": "Quick stack alignment check — not pass/fail, helps rank for technical round",
+      "depth": "screening",
+      "tags": ["tech-stack", "experience"],
+      "bank": "screening",
+      "inputType": "tech_matrix",
+      "matrixOptions": {
+        "technologies": ["FastAPI", "SQLAlchemy", "Docker", "Kubernetes", "Terraform"],
+        "levels": ["None", "Basic", "Intermediate", "Advanced"]
+      }
+    },
+    {
+      "id": "screening_10",
+      "category": "Engagement",
+      "question": "Is there anything about this role or our setup that you would like clarity on before we proceed to the next round?",
+      "assesses": "Candidate engagement signal — good candidates ask thoughtful questions",
+      "depth": "screening",
+      "tags": ["engagement"],
+      "bank": "screening",
+      "inputType": "text"
+    }
+  ]
+}
