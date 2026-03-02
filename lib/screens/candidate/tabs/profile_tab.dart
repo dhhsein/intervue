@@ -112,9 +112,6 @@ class ProfileTab extends ConsumerWidget {
             icon: Icons.folder_outlined,
             title: 'Assignment',
             result: _getAssignmentResult(assignment),
-            subtitle: assignment?.weightedScore != null
-                ? '${assignment!.weightedScore.toStringAsFixed(1)}/5'
-                : null,
             color: _getAssignmentColor(assignment?.recommendation),
           ),
         ),
@@ -127,7 +124,6 @@ class ProfileTab extends ConsumerWidget {
     required String title,
     required String result,
     required Color color,
-    String? subtitle,
   }) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -150,15 +146,6 @@ class ProfileTab extends ConsumerWidget {
             style: AppTypography.titleSmall.copyWith(color: color),
             textAlign: TextAlign.center,
           ),
-          if (subtitle != null) ...[
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              subtitle,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -258,9 +245,7 @@ class ProfileTab extends ConsumerWidget {
     if (screening == null) {
       return Text(
         'No compensation data yet',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textTertiary,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
       );
     }
 
@@ -270,9 +255,7 @@ class ProfileTab extends ConsumerWidget {
     if (ctcResponse == null) {
       return Text(
         'No compensation data yet',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textTertiary,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
       );
     }
 
@@ -316,9 +299,7 @@ class ProfileTab extends ConsumerWidget {
     if (screening == null) {
       return Text(
         'No availability data yet',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textTertiary,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.textTertiary),
       );
     }
 
@@ -370,9 +351,7 @@ class ProfileTab extends ConsumerWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Text(value, style: AppTypography.bodyMedium),
-          ),
+          Expanded(child: Text(value, style: AppTypography.bodyMedium)),
         ],
       ),
     );
@@ -389,11 +368,13 @@ class ProfileTab extends ConsumerWidget {
     ];
 
     for (final change in candidate.timeline) {
-      timeline.add(_TimelineEntry(
-        date: change.at,
-        label: _getStatusChangeLabel(change),
-        icon: _getStatusIcon(change.to),
-      ));
+      timeline.add(
+        _TimelineEntry(
+          date: change.at,
+          label: _getStatusChangeLabel(change),
+          icon: _getStatusIcon(change.to),
+        ),
+      );
     }
 
     timeline.sort((a, b) => b.date.compareTo(a.date));
@@ -471,9 +452,5 @@ class _TimelineEntry {
   final String label;
   final IconData icon;
 
-  _TimelineEntry({
-    required this.date,
-    required this.label,
-    required this.icon,
-  });
+  _TimelineEntry({required this.date, required this.label, required this.icon});
 }
