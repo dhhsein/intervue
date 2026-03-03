@@ -13,12 +13,10 @@ class StatusBadge extends StatelessWidget {
     switch (status) {
       case CandidateStatus.newCandidate:
         return AppColors.statusNew;
-      case CandidateStatus.screeningSent:
-        return AppColors.statusScreeningSent;
       case CandidateStatus.screeningDone:
         return AppColors.statusScreeningDone;
-      case CandidateStatus.phoneScreen:
-        return AppColors.statusPhoneScreen;
+      case CandidateStatus.callUnattended:
+        return AppColors.statusCallUnattended;
       case CandidateStatus.pendingScheduling:
         return AppColors.statusPendingScheduling;
       case CandidateStatus.technical:

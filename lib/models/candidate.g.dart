@@ -52,9 +52,8 @@ Map<String, dynamic> _$CandidateToJson(Candidate instance) => <String, dynamic>{
 
 const _$CandidateStatusEnumMap = {
   CandidateStatus.newCandidate: 'new',
-  CandidateStatus.screeningSent: 'screening_sent',
   CandidateStatus.screeningDone: 'screening_done',
-  CandidateStatus.phoneScreen: 'phone_screen',
+  CandidateStatus.callUnattended: 'call_unattended',
   CandidateStatus.pendingScheduling: 'pending_scheduling',
   CandidateStatus.technical: 'technical',
   CandidateStatus.assignment: 'assignment',

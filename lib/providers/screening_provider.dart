@@ -86,21 +86,6 @@ class ScreeningNotifier extends FamilyAsyncNotifier<ScreeningData, String> {
     await _save(updated);
   }
 
-  /// Mark email as sent.
-  Future<void> markEmailSent() async {
-    final current = state.valueOrNull ?? ScreeningData();
-    final updated = ScreeningData(
-      emailSentAt: DateTime.now(),
-      responseReceivedAt: current.responseReceivedAt,
-      phoneScreenAt: current.phoneScreenAt,
-      grade: current.grade,
-      responses: current.responses,
-      phoneScreen: current.phoneScreen,
-    );
-    state = AsyncData(updated);
-    await _save(updated);
-  }
-
   /// Mark response as received.
   Future<void> markResponseReceived() async {
     final current = state.valueOrNull ?? ScreeningData();

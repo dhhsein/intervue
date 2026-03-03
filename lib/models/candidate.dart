@@ -76,12 +76,10 @@ class Candidate {
 enum CandidateStatus {
   @JsonValue('new')
   newCandidate('new'),
-  @JsonValue('screening_sent')
-  screeningSent('screening_sent'),
   @JsonValue('screening_done')
   screeningDone('screening_done'),
-  @JsonValue('phone_screen')
-  phoneScreen('phone_screen'),
+  @JsonValue('call_unattended')
+  callUnattended('call_unattended'),
   @JsonValue('pending_scheduling')
   pendingScheduling('pending_scheduling'),
   @JsonValue('technical')
@@ -104,12 +102,10 @@ enum CandidateStatus {
     switch (this) {
       case CandidateStatus.newCandidate:
         return 'New';
-      case CandidateStatus.screeningSent:
-        return 'Screening Sent';
       case CandidateStatus.screeningDone:
         return 'Screening Done';
-      case CandidateStatus.phoneScreen:
-        return 'Phone Screen';
+      case CandidateStatus.callUnattended:
+        return 'Call Unattended';
       case CandidateStatus.pendingScheduling:
         return 'Pending Scheduling';
       case CandidateStatus.technical:
@@ -130,9 +126,8 @@ enum CandidateStatus {
   PipelineStage get pipelineStage {
     switch (this) {
       case CandidateStatus.newCandidate:
-      case CandidateStatus.screeningSent:
       case CandidateStatus.screeningDone:
-      case CandidateStatus.phoneScreen:
+      case CandidateStatus.callUnattended:
         return PipelineStage.screening;
       case CandidateStatus.pendingScheduling:
         return PipelineStage.scheduled;
