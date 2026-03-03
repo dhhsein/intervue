@@ -12,6 +12,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../utils/meeting_info_parser.dart';
+import '../../../widgets/grade_action_button.dart';
 
 class TechnicalTab extends ConsumerStatefulWidget {
   final String candidateId;
@@ -79,7 +80,7 @@ class _TechnicalTabState extends ConsumerState<TechnicalTab> {
         if (technical == null || !technical.completed) {
           return _buildNoInterviewState(context);
         }
-        return _buildInterviewResults(context, ref, technical);
+        return _buildInterviewResults(context, ref, technical, detail.candidate.name);
       },
     );
   }
@@ -450,6 +451,7 @@ class _TechnicalTabState extends ConsumerState<TechnicalTab> {
     BuildContext context,
     WidgetRef ref,
     TechnicalRound technical,
+    String candidateName,
   ) {
     final dateFormat = DateFormat('MMM d, yyyy');
     final duration = Duration(seconds: technical.durationSeconds);
@@ -510,6 +512,17 @@ class _TechnicalTabState extends ConsumerState<TechnicalTab> {
               ],
 
               const SizedBox(height: AppSpacing.xl),
+
+              // Grade action CTA
+              GradeActionButton(
+                gradeValue: technical.recommendation,
+                positiveGrades: const {'advance'},
+                negativeGrades: const {'reject'},
+                candidateId: widget.candidateId,
+                candidateName: candidateName,
+                nextStatus: CandidateStatus.assignment,
+              ),
+              const SizedBox(height: AppSpacing.lg),
 
               // Start new interview button
               Center(

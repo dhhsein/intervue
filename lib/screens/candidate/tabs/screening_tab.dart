@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../models/candidate.dart';
 import '../../../models/interview_question.dart';
 import '../../../models/screening_data.dart';
 import '../../../providers/candidates_provider.dart';
@@ -10,6 +11,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/auto_save_text_field.dart';
+import '../../../widgets/grade_action_button.dart';
 import '../../../widgets/grade_selector.dart';
 import '../../../widgets/multi_select_chips.dart';
 import '../../../widgets/number_input.dart';
@@ -66,7 +68,7 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
                     (entry) => _buildQuestionCard(entry.key, entry.value, screening),
                   ),
               const SizedBox(height: AppSpacing.xl),
-              _buildGradeSection(screening),
+              _buildGradeSection(screening, candidateName),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -129,16 +131,6 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
       child: Text(
         label,
         style: AppTypography.titleSmall.copyWith(color: color),
-      ),
-    );
-  }
-
-  void _showToast(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -358,15 +350,10 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
         ? null
         : ScreeningGrade.values.firstWhere((g) => g.value == value);
 
-    // Update the grade only — status changes are manual via the status dropdown
     ref.read(screeningNotifierProvider(widget.candidateId).notifier).updateGrade(grade);
-
-    if (grade != null) {
-      _showToast('Grading saved. Update the candidate status manually.');
-    }
   }
 
-  Widget _buildGradeSection(ScreeningData screening) {
+  Widget _buildGradeSection(ScreeningData screening, String candidateName) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -393,6 +380,15 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
           value: screening.grade?.value,
           options: GradeSelector.screeningGradeOptions,
           onChanged: (value) => _handleGradeChange(value),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        GradeActionButton(
+          gradeValue: screening.grade?.value,
+          positiveGrades: const {'strong'},
+          negativeGrades: const {'no'},
+          candidateId: widget.candidateId,
+          candidateName: candidateName,
+          nextStatus: CandidateStatus.pendingScheduling,
         ),
       ],
     );

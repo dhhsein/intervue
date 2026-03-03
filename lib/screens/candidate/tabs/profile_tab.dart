@@ -423,8 +423,6 @@ class ProfileTab extends ConsumerWidget {
 
   IconData _getStatusIcon(String status) {
     switch (status) {
-      case 'screening_done':
-        return Icons.check_circle_outline;
       case 'call_unattended':
         return Icons.phone_missed_outlined;
       case 'technical':

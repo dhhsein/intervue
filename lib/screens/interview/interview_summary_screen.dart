@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/candidate.dart';
 import '../../models/technical_round.dart';
 import '../../providers/candidates_provider.dart';
 import '../../providers/data_service_provider.dart';
 import '../../providers/interview_provider.dart';
 import '../../providers/questions_provider.dart';
-import '../../providers/save_status_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
 import '../../widgets/auto_save_text_field.dart';
+import '../../widgets/grade_action_button.dart';
 import '../../widgets/grade_selector.dart';
 import '../../widgets/score_selector.dart';
 
@@ -572,82 +573,51 @@ class _InterviewSummaryScreenState
   }
 
   Widget _buildSaveButton(InterviewSession session) {
+    final candidateAsync = ref.watch(candidateDetailProvider(widget.candidateId));
+    final candidateName = candidateAsync.whenOrNull(
+      data: (detail) => detail.candidate.name,
+    ) ?? '';
+
     return Center(
       child: SizedBox(
         width: 300,
-        child: ElevatedButton(
-          onPressed: () => _saveAndReturn(session),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: Text(
-            'Save & Return to Candidate',
-            style: AppTypography.buttonText,
-          ),
+        child: GradeActionButton(
+          gradeValue: _recommendation,
+          positiveGrades: const {'advance'},
+          negativeGrades: const {'reject'},
+          candidateId: widget.candidateId,
+          candidateName: candidateName,
+          nextStatus: CandidateStatus.assignment,
+          onBeforeStatusUpdate: () => _saveInterview(session),
+          onComplete: () {
+            if (mounted) {
+              context.go('/candidate/${widget.candidateId}');
+            }
+          },
         ),
       ),
     );
   }
 
-  Future<void> _saveAndReturn(InterviewSession session) async {
-    ref.read(saveStatusProvider.notifier).setSaving();
+  Future<void> _saveInterview(InterviewSession session) async {
+    // Build the technical round data
+    final technicalRound = TechnicalRound(
+      candidateId: widget.candidateId,
+      date: session.startTime,
+      durationSeconds: session.elapsed.inSeconds,
+      questions: session.scores,
+      impressions: _impressions,
+      fraudAssessment: _fraudAssessment,
+      recommendation: _recommendation,
+      completed: true,
+    );
 
-    try {
-      // Build the technical round data
-      final technicalRound = TechnicalRound(
-        candidateId: widget.candidateId,
-        date: session.startTime,
-        durationSeconds: session.elapsed.inSeconds,
-        questions: session.scores,
-        impressions: _impressions,
-        fraudAssessment: _fraudAssessment,
-        recommendation: _recommendation,
-        completed: true,
-      );
+    // Save to server
+    final dataService = ref.read(dataServiceProvider);
+    await dataService.saveTechnicalRound(widget.candidateId, technicalRound);
 
-      // Save to server
-      final dataService = ref.read(dataServiceProvider);
-      await dataService.saveTechnicalRound(widget.candidateId, technicalRound);
-
-      // Clear the interview session
-      ref.read(interviewProvider.notifier).endInterview();
-      ref.read(selectedQuestionsProvider.notifier).state = {};
-
-      // Status changes are manual — show guidance toast
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Interview saved. Update the candidate status manually.'),
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-
-      // Invalidate candidate detail to refresh
-      ref.invalidate(candidateDetailProvider(widget.candidateId));
-
-      ref.read(saveStatusProvider.notifier).setSaved();
-
-      // Navigate back to candidate
-      if (mounted) {
-        context.go('/candidate/${widget.candidateId}');
-      }
-    } catch (e) {
-      ref.read(saveStatusProvider.notifier).setError();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
+    // Clear the interview session
+    ref.read(interviewProvider.notifier).endInterview();
+    ref.read(selectedQuestionsProvider.notifier).state = {};
   }
 }

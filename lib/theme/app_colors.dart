@@ -55,7 +55,6 @@ class AppColors {
 
   // Screening stage colors (blue progression)
   static const Color statusNew = Color(0xFFF1C40F);           // Yellow
-  static const Color statusScreeningDone = Color(0xFF3498DB); // Blue
   static const Color statusCallUnattended = Color(0xFFE67E22); // Orange
 
   // Technical stage colors

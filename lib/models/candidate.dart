@@ -76,8 +76,6 @@ class Candidate {
 enum CandidateStatus {
   @JsonValue('new')
   newCandidate('new'),
-  @JsonValue('screening_done')
-  screeningDone('screening_done'),
   @JsonValue('call_unattended')
   callUnattended('call_unattended'),
   @JsonValue('pending_scheduling')
@@ -102,8 +100,6 @@ enum CandidateStatus {
     switch (this) {
       case CandidateStatus.newCandidate:
         return 'New';
-      case CandidateStatus.screeningDone:
-        return 'Screening Done';
       case CandidateStatus.callUnattended:
         return 'Call Unattended';
       case CandidateStatus.pendingScheduling:
@@ -126,7 +122,6 @@ enum CandidateStatus {
   PipelineStage get pipelineStage {
     switch (this) {
       case CandidateStatus.newCandidate:
-      case CandidateStatus.screeningDone:
       case CandidateStatus.callUnattended:
         return PipelineStage.screening;
       case CandidateStatus.pendingScheduling:

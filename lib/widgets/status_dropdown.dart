@@ -64,8 +64,6 @@ class StatusDropdown extends StatelessWidget {
     switch (status) {
       case CandidateStatus.newCandidate:
         return AppColors.statusNew;
-      case CandidateStatus.screeningDone:
-        return AppColors.statusScreeningDone;
       case CandidateStatus.callUnattended:
         return AppColors.statusCallUnattended;
       case CandidateStatus.pendingScheduling:

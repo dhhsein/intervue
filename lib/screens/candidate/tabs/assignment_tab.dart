@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../models/assignment_review.dart';
+import '../../../models/candidate.dart';
 import '../../../providers/assignment_provider.dart';
 import '../../../providers/candidates_provider.dart';
 import '../../../providers/config_provider.dart';
@@ -12,6 +13,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/auto_save_text_field.dart';
+import '../../../widgets/grade_action_button.dart';
 import '../../../widgets/grade_selector.dart';
 import '../../../widgets/score_selector.dart';
 import '../../../widgets/toggle_chips.dart';
@@ -25,11 +27,16 @@ class AssignmentTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final assignmentAsync =
         ref.watch(assignmentReviewNotifierProvider(candidateId));
+    final candidateAsync = ref.watch(candidateDetailProvider(candidateId));
 
     return assignmentAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, stack) => Center(child: Text('Error: $err')),
-      data: (assignment) => _buildContent(context, ref, assignment),
+      data: (assignment) => candidateAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (detail) => _buildContent(context, ref, assignment, detail.candidate.name),
+      ),
     );
   }
 
@@ -37,6 +44,7 @@ class AssignmentTab extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AssignmentReview assignment,
+    String candidateName,
   ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -75,7 +83,7 @@ class AssignmentTab extends ConsumerWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // Recommendation
-              _buildRecommendationSection(context, ref, assignment),
+              _buildRecommendationSection(context, ref, assignment, candidateName),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -934,6 +942,7 @@ Best,
     BuildContext context,
     WidgetRef ref,
     AssignmentReview assignment,
+    String candidateName,
   ) {
     final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
 
@@ -963,17 +972,19 @@ Best,
                 options: GradeSelector.assessmentGradeOptions,
                 onChanged: (value) {
                   notifier.updateRecommendation(value);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Recommendation saved. Update the candidate status manually.'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
                 },
               ),
             ],
           ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        GradeActionButton(
+          gradeValue: assignment.recommendation,
+          positiveGrades: const {'pass'},
+          negativeGrades: const {'reject'},
+          candidateId: candidateId,
+          candidateName: candidateName,
+          nextStatus: CandidateStatus.finalReview,
         ),
       ],
     );
