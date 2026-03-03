@@ -58,9 +58,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final rejected = candidates
         .where((c) => c.status.pipelineStage == PipelineStage.rejected)
         .toList();
-    final hired = candidates
-        .where((c) => c.status.pipelineStage == PipelineStage.hired)
-        .toList();
 
     return Container(
       height: 64,
@@ -87,16 +84,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             label: const Text('Add Candidate'),
           ),
           const SizedBox(width: AppSpacing.lg),
-          IconButton(
-            onPressed: () => context.push('/compare'),
-            icon: const Icon(Icons.compare_arrows),
-            tooltip: 'Compare Finalists',
-            color: AppColors.textSecondary,
-          ),
+          if (candidates.any((c) => c.status == CandidateStatus.finalReview))
+            IconButton(
+              onPressed: () => context.push('/compare'),
+              icon: const Icon(Icons.compare_arrows),
+              tooltip: 'Compare Finalists',
+              color: AppColors.textSecondary,
+            ),
           const SizedBox(width: AppSpacing.sm),
-          _buildCountBadge(rejected.length, AppColors.error, 'Rejected', rejected),
-          const SizedBox(width: AppSpacing.sm),
-          _buildCountBadge(hired.length, AppColors.success, 'Hired', hired),
+          _buildRejectedBadge(rejected.length),
           const SizedBox(width: AppSpacing.lg),
           const SaveIndicator(),
           const SizedBox(width: AppSpacing.sm),
@@ -125,24 +121,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildCountBadge(int count, Color color, String tooltip, List<Candidate> candidates) {
+  Widget _buildRejectedBadge(int count) {
     return Tooltip(
-      message: tooltip,
+      message: 'Rejected',
       child: InkWell(
-        onTap: candidates.isEmpty ? null : () => _showCandidateList(tooltip, candidates),
+        onTap: count == 0 ? null : () => context.push('/rejected'),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$count',
               style: AppTypography.label.copyWith(
-                color: color,
+                color: Colors.grey,
                 fontSize: 11,
               ),
             ),
@@ -256,40 +252,4 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     context.push('/candidate/${candidate.id}');
   }
 
-  void _showCandidateList(String title, List<Candidate> candidates) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(title, style: AppTypography.titleMedium),
-        content: SizedBox(
-          width: 300,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: candidates.length,
-            itemBuilder: (context, index) {
-              final candidate = candidates[index];
-              return ListTile(
-                title: Text(candidate.name, style: AppTypography.bodyMedium),
-                subtitle: Text(
-                  candidate.email,
-                  style: AppTypography.bodySmall,
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _navigateToCandidate(candidate);
-                },
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -12,15 +12,13 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_typography.dart';
 
-/// Provider for candidates eligible for comparison (Assignment or Final Review).
+/// Provider for candidates eligible for comparison (Final Review only).
 final comparableCandidatesProvider =
     Provider<AsyncValue<List<Candidate>>>((ref) {
   final candidatesAsync = ref.watch(candidatesProvider);
   return candidatesAsync.whenData((candidates) {
     return candidates.where((c) {
-      return c.status == CandidateStatus.assignment ||
-          c.status == CandidateStatus.finalReview ||
-          c.status == CandidateStatus.offer;
+      return c.status == CandidateStatus.finalReview;
     }).toList();
   });
 });
