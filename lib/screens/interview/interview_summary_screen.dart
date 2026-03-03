@@ -618,12 +618,15 @@ class _InterviewSummaryScreenState
       ref.read(interviewProvider.notifier).endInterview();
       ref.read(selectedQuestionsProvider.notifier).state = {};
 
-      // Update candidate status based on recommendation
-      if (_recommendation == 'reject') {
-        await dataService.updateCandidate(widget.candidateId, {
-          'status': 'rejected',
-          'rejectionReason': 'Failed technical interview',
-        });
+      // Status changes are manual — show guidance toast
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Interview saved. Update the candidate status manually.'),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 3),
+          ),
+        );
       }
 
       // Invalidate candidate detail to refresh

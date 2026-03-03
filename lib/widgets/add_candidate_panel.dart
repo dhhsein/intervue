@@ -2,14 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
-
 import '../providers/candidates_provider.dart';
 import '../providers/data_service_provider.dart';
 import '../providers/save_status_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../utils/web_file_picker.dart';
 
 class AddCandidatePanel extends ConsumerStatefulWidget {
   final VoidCallback onClose;
@@ -45,14 +44,10 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   }
 
   Future<void> _pickResume() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-      withData: true,
-    );
+    final result = await pickPdfFile();
 
-    if (result != null && result.files.isNotEmpty) {
-      final fileName = result.files.first.name;
+    if (result != null) {
+      final fileName = result.name;
       // Derive candidate name from filename: "john-doe.pdf" -> "John Doe"
       // Handles: JohnDoe, john-doe, john_doe, john doe
       final nameFromFile = fileName
@@ -66,7 +61,7 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
 
       setState(() {
         _selectedFileName = fileName;
-        _selectedFileBytes = result.files.first.bytes;
+        _selectedFileBytes = result.bytes;
         _nameController.text = nameFromFile;
       });
     }

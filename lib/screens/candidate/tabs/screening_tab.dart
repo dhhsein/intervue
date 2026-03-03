@@ -13,7 +13,6 @@ import '../../../widgets/auto_save_text_field.dart';
 import '../../../widgets/grade_selector.dart';
 import '../../../widgets/multi_select_chips.dart';
 import '../../../widgets/number_input.dart';
-import '../../../widgets/reject_dialog.dart';
 import '../../../widgets/tech_level_matrix.dart';
 import '../../../widgets/toggle_chips.dart';
 
@@ -359,44 +358,12 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
         ? null
         : ScreeningGrade.values.firstWhere((g) => g.value == value);
 
-    // Update the grade
+    // Update the grade only — status changes are manual via the status dropdown
     ref.read(screeningNotifierProvider(widget.candidateId).notifier).updateGrade(grade);
 
-    // Handle status changes based on grade
-    if (grade == ScreeningGrade.strong) {
-      // Strong → move to pending scheduling
-      await ref.read(candidatesProvider.notifier).updateCandidate(
-        widget.candidateId,
-        {'status': 'pending_scheduling'},
-      );
-      _showToast('Candidate moved to Pending Scheduling');
-    } else if (grade == ScreeningGrade.no) {
-      // No → show reject dialog
-      final candidateAsync = ref.read(candidateDetailProvider(widget.candidateId));
-      final candidateName = candidateAsync.valueOrNull?.candidate.name ?? 'Candidate';
-
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => RejectDialog(
-            candidateName: candidateName,
-            onReject: (reason) async {
-              await ref.read(candidatesProvider.notifier).updateCandidate(
-                widget.candidateId,
-                {
-                  'status': 'rejected',
-                  'rejectionReason': reason,
-                },
-              );
-              if (mounted) {
-                _showToast('Candidate rejected');
-              }
-            },
-          ),
-        );
-      }
+    if (grade != null) {
+      _showToast('Grading saved. Update the candidate status manually.');
     }
-    // Maybe → stay in screening, no status change needed
   }
 
   Widget _buildGradeSection(ScreeningData screening) {

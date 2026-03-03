@@ -961,20 +961,15 @@ Best,
               GradeSelector(
                 value: assignment.recommendation,
                 options: GradeSelector.assessmentGradeOptions,
-                onChanged: (value) async {
+                onChanged: (value) {
                   notifier.updateRecommendation(value);
-
-                  // Update candidate status based on grade
-                  // Only Pass changes status to Final Review
-                  // Hold and Reject do not change status
-                  if (value == 'pass') {
-                    await ref.read(candidatesProvider.notifier).updateCandidate(
-                      candidateId,
-                      {'status': 'final_review'},
-                    );
-                    // Refresh the candidate detail to show updated status
-                    ref.invalidate(candidateDetailProvider(candidateId));
-                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Recommendation saved. Update the candidate status manually.'),
+                      behavior: SnackBarBehavior.floating,
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
                 },
               ),
             ],
