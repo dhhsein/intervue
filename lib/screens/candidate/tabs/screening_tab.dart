@@ -11,6 +11,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/auto_save_text_field.dart';
+import '../../../widgets/day_time_picker.dart';
 import '../../../widgets/grade_action_button.dart';
 import '../../../widgets/grade_selector.dart';
 import '../../../widgets/multi_select_chips.dart';
@@ -320,6 +321,19 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
           onChanged: (values) => _updateResponse(
             question.id,
             response.copyWith(techLevels: values),
+          ),
+        );
+
+      case 'day_time_picker':
+        return DayTimePicker(
+          selectedDay: response.selectedOption,
+          timeRange: response.textValue,
+          onChanged: (day, timeRange) => _updateResponse(
+            question.id,
+            response.copyWith(
+              selectedOption: day,
+              textValue: timeRange,
+            ),
           ),
         );
 
