@@ -326,12 +326,12 @@ class _ScreeningTabState extends ConsumerState<ScreeningTab> {
 
       case 'day_time_picker':
         return DayTimePicker(
-          selectedDay: response.selectedOption,
+          selectedDays: response.selectedOptions ?? [],
           timeRange: response.textValue,
-          onChanged: (day, timeRange) => _updateResponse(
+          onChanged: (days, timeRange) => _updateResponse(
             question.id,
             response.copyWith(
-              selectedOption: day,
+              selectedOptions: days,
               textValue: timeRange,
             ),
           ),

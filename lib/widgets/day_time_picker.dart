@@ -8,13 +8,13 @@ import '../theme/app_typography.dart';
 
 /// A combined day selector (5 tiles) + time range picker for scheduling.
 class DayTimePicker extends StatefulWidget {
-  final String? selectedDay;
+  final List<String> selectedDays;
   final String? timeRange;
-  final void Function(String? day, String? timeRange) onChanged;
+  final void Function(List<String> days, String? timeRange) onChanged;
 
   const DayTimePicker({
     super.key,
-    this.selectedDay,
+    this.selectedDays = const [],
     this.timeRange,
     required this.onChanged,
   });
@@ -66,8 +66,13 @@ class _DayTimePickerState extends State<DayTimePicker> {
 
   void _onDayTap(DateTime day) {
     final iso = DateFormat('yyyy-MM-dd').format(day);
-    final newDay = widget.selectedDay == iso ? null : iso;
-    widget.onChanged(newDay, _buildTimeRange());
+    final updated = List<String>.from(widget.selectedDays);
+    if (updated.contains(iso)) {
+      updated.remove(iso);
+    } else {
+      updated.add(iso);
+    }
+    widget.onChanged(updated, _buildTimeRange());
   }
 
   String? _buildTimeRange() {
@@ -78,7 +83,7 @@ class _DayTimePickerState extends State<DayTimePicker> {
   }
 
   void _onTimeChanged() {
-    widget.onChanged(widget.selectedDay, _buildTimeRange());
+    widget.onChanged(widget.selectedDays, _buildTimeRange());
   }
 
   @override
@@ -96,7 +101,7 @@ class _DayTimePickerState extends State<DayTimePicker> {
         Row(
           children: days.map((day) {
             final iso = DateFormat('yyyy-MM-dd').format(day);
-            final isSelected = widget.selectedDay == iso;
+            final isSelected = widget.selectedDays.contains(iso);
             final dayName = DateFormat('E').format(day);
             final dateStr = DateFormat('d MMM').format(day);
 
