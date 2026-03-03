@@ -169,6 +169,21 @@ class LocalDataService implements DataService {
   }
 
   @override
+  Future<Map<String, String?>> extractResumeFromBytes(Uint8List bytes) async {
+    final response = await _dio.post(
+      '/api/resume/extract',
+      data: Stream.fromIterable([bytes]),
+      options: Options(
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Length': bytes.length,
+        },
+      ),
+    );
+    return Map<String, String?>.from(response.data as Map);
+  }
+
+  @override
   Future<AppConfig> getConfig() async {
     final response = await _dio.get('/api/config');
     return AppConfig.fromJson(response.data as Map<String, dynamic>);

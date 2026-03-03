@@ -49,6 +49,7 @@ void main(List<String> args) async {
 
   app.post('/api/candidates/<id>/resume', _uploadResume);
   app.get('/api/candidates/<id>/resume/extract', _extractResumeInfo);
+  app.post('/api/resume/extract', _extractResumeFromBytes);
   app.get('/api/files/<path|.*>', _serveFile);
 
   app.get('/api/config', _getConfig);
@@ -569,6 +570,27 @@ Future<Response> _extractResumeInfo(Request request, String id) async {
       jsonEncode(contactInfo),
       headers: {'Content-Type': 'application/json'},
     );
+  } catch (e) {
+    return _errorResponse('Failed to parse resume: $e', 500);
+  }
+}
+
+Future<Response> _extractResumeFromBytes(Request request) async {
+  try {
+    final bytes = await request.read().expand((x) => x).toList();
+    final tempDir = await Directory.systemTemp.createTemp('resume_extract_');
+    final tempFile = File(path.join(tempDir.path, 'resume.pdf'));
+    await tempFile.writeAsBytes(bytes);
+
+    try {
+      final contactInfo = await ResumeParser.extractContactInfo(tempFile);
+      return Response.ok(
+        jsonEncode(contactInfo),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } finally {
+      await tempDir.delete(recursive: true);
+    }
   } catch (e) {
     return _errorResponse('Failed to parse resume: $e', 500);
   }

@@ -35,8 +35,6 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   Uint8List? _selectedFileBytes;
   bool _isSubmitting = false;
   bool _isExtracting = false;
-  String? _createdCandidateId;
-
 
   @override
   void dispose() {
@@ -77,35 +75,11 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
   Future<void> _extractFromResume() async {
     if (_selectedFileBytes == null) return;
 
-    // Only require name for extraction
-    final name = _nameController.text.trim();
-    if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name first')),
-      );
-      return;
-    }
-
     setState(() => _isExtracting = true);
 
     try {
       final dataService = ref.read(dataServiceProvider);
-
-      // Create candidate first if not already created
-      if (_createdCandidateId == null) {
-        final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
-              name: name,
-              email: 'pending@extract.local',
-              phone: null,
-            );
-        _createdCandidateId = candidate.id;
-
-        // Upload the resume
-        await dataService.uploadResume(candidate.id, _selectedFileBytes!);
-      }
-
-      // Extract contact info
-      final info = await dataService.extractResumeInfo(_createdCandidateId!);
+      final info = await dataService.extractResumeFromBytes(_selectedFileBytes!);
 
       if (mounted) {
         setState(() {
@@ -145,38 +119,19 @@ class _AddCandidatePanelState extends ConsumerState<AddCandidatePanel> {
     ref.read(saveStatusProvider.notifier).setSaving();
 
     try {
-      String candidateId;
+      final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            phone: _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+          );
+      final candidateId = candidate.id;
 
-      if (_createdCandidateId != null) {
-        // Candidate was already created during extraction, just update it
-        candidateId = _createdCandidateId!;
-        await ref.read(candidatesProvider.notifier).updateCandidate(
-              candidateId,
-              {
-                'name': _nameController.text.trim(),
-                'email': _emailController.text.trim(),
-                'phone': _phoneController.text.trim().isEmpty
-                    ? null
-                    : _phoneController.text.trim(),
-              },
-            );
+      if (_selectedFileBytes != null) {
+        final dataService = ref.read(dataServiceProvider);
+        await dataService.uploadResume(candidate.id, _selectedFileBytes!);
         await ref.read(candidatesProvider.notifier).refresh();
-      } else {
-        // Create new candidate
-        final candidate = await ref.read(candidatesProvider.notifier).createCandidate(
-              name: _nameController.text.trim(),
-              email: _emailController.text.trim(),
-              phone: _phoneController.text.trim().isEmpty
-                  ? null
-                  : _phoneController.text.trim(),
-            );
-        candidateId = candidate.id;
-
-        if (_selectedFileBytes != null) {
-          final dataService = ref.read(dataServiceProvider);
-          await dataService.uploadResume(candidate.id, _selectedFileBytes!);
-          await ref.read(candidatesProvider.notifier).refresh();
-        }
       }
 
       ref.read(saveStatusProvider.notifier).setSaved();
