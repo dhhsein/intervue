@@ -111,6 +111,16 @@
       "bank": "technical"
     },
     {
+      "id": "tech_data_03",
+      "category": "Data & Integrations",
+      "question": "Our API returns a list of workout sessions for a user — some power users have 50,000+ records. Compare offset-based pagination (page/limit) vs cursor-based pagination for this endpoint. When would you pick one over the other, and what breaks when the dataset is large and actively being written to?",
+      "assesses": "Pagination strategy, database performance at scale, API design trade-offs, consistency under concurrent writes",
+      "fraudProbe": "Ask: 'What happens to offset pagination if a new record is inserted while the client is paginating through results?' Then: 'What would your cursor look like — a timestamp, an ID, or something else? Why?' Finally: 'Have you ever had to migrate an API from offset to cursor pagination? What was painful about it?' Real practitioners know about skipped/duplicate rows with offset and the encoding choices for opaque cursors.",
+      "depth": "core",
+      "tags": ["api-design", "pagination", "database", "performance", "scale"],
+      "bank": "technical"
+    },
+    {
       "id": "tech_testing_01",
       "category": "Testing & Code Quality",
       "question": "How do you decide what to test in a backend service? Walk me through your testing strategy for a new endpoint that creates a subscription via Razorpay and updates the user's plan.",
