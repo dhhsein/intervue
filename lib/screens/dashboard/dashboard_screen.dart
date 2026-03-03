@@ -15,6 +15,11 @@ import '../../widgets/settings_dialog.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
+enum DashboardSort { name, dateAdded }
+
+final dashboardSortProvider =
+    StateProvider<DashboardSort>((ref) => DashboardSort.dateAdded);
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -96,6 +101,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           const SizedBox(width: AppSpacing.lg),
           const SaveIndicator(),
           const SizedBox(width: AppSpacing.sm),
+          _buildSortButton(),
+          const SizedBox(width: AppSpacing.sm),
           IconButton(
             onPressed: () => ref.invalidate(candidatesProvider),
             icon: const Icon(Icons.refresh),
@@ -118,6 +125,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     showDialog(
       context: context,
       builder: (context) => const SettingsDialog(),
+    );
+  }
+
+  Widget _buildSortButton() {
+    final sort = ref.watch(dashboardSortProvider);
+    final isByName = sort == DashboardSort.name;
+    return IconButton(
+      onPressed: () {
+        ref.read(dashboardSortProvider.notifier).state =
+            isByName ? DashboardSort.dateAdded : DashboardSort.name;
+      },
+      icon: Icon(isByName ? Icons.sort_by_alpha : Icons.schedule),
+      tooltip: isByName ? 'Sorted by name' : 'Sorted by date added',
+      color: AppColors.textSecondary,
     );
   }
 
@@ -175,15 +196,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  List<Candidate> _sortedCandidates(List<Candidate> list) {
+    final sort = ref.read(dashboardSortProvider);
+    if (sort == DashboardSort.name) {
+      list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    } else {
+      list.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    }
+    return list;
+  }
+
   Widget _buildPipelineView(List<Candidate> candidates) {
+    final sort = ref.watch(dashboardSortProvider);
     final screening = candidates
         .where((c) => c.effectivePipelineStage == PipelineStage.screening)
         .toList();
     final scheduled = candidates
         .where((c) => c.effectivePipelineStage == PipelineStage.scheduled)
-        .toList()
-      ..sort((a, b) => (a.scheduledMeetingTime ?? DateTime.now())
-          .compareTo(b.scheduledMeetingTime ?? DateTime.now()));
+        .toList();
     final technical = candidates
         .where((c) => c.effectivePipelineStage == PipelineStage.technical)
         .toList();
@@ -193,6 +223,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final finalReview = candidates
         .where((c) => c.effectivePipelineStage == PipelineStage.finalReview)
         .toList();
+
+    // Apply sort to all columns (scheduled keeps meeting-time order when sorting by date)
+    if (sort == DashboardSort.name) {
+      for (final list in [screening, scheduled, technical, assignment, finalReview]) {
+        _sortedCandidates(list);
+      }
+    } else {
+      _sortedCandidates(screening);
+      scheduled.sort((a, b) => (a.scheduledMeetingTime ?? DateTime.now())
+          .compareTo(b.scheduledMeetingTime ?? DateTime.now()));
+      _sortedCandidates(technical);
+      _sortedCandidates(assignment);
+      _sortedCandidates(finalReview);
+    }
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
