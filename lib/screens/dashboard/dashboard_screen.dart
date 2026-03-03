@@ -47,9 +47,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           if (_showAddPanel)
             AddCandidatePanel(
               onClose: () => setState(() => _showAddPanel = false),
-              onCreated: (id) {
-                context.push('/candidate/$id');
-              },
+              onCreated: (_) {},
             ),
         ],
       ),
