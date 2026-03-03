@@ -409,8 +409,6 @@ Future<Response> _saveScreening(Request request, String id) async {
     _deepMerge(existing, updates);
     await screeningFile.writeAsString(jsonEncode(existing));
 
-    await _touchCandidate(id);
-
     return Response.ok(jsonEncode(existing),
         headers: {'Content-Type': 'application/json'});
   } catch (e) {
@@ -456,8 +454,6 @@ Future<Response> _saveTechnical(Request request, String id) async {
     _deepMerge(existing, updates);
     await technicalFile.writeAsString(jsonEncode(existing));
 
-    await _touchCandidate(id);
-
     return Response.ok(jsonEncode(existing),
         headers: {'Content-Type': 'application/json'});
   } catch (e) {
@@ -502,8 +498,6 @@ Future<Response> _saveAssignment(Request request, String id) async {
 
     _deepMerge(existing, updates);
     await assignmentFile.writeAsString(jsonEncode(existing));
-
-    await _touchCandidate(id);
 
     return Response.ok(jsonEncode(existing),
         headers: {'Content-Type': 'application/json'});
@@ -660,16 +654,6 @@ Future<Response> _saveConfig(Request request) async {
         headers: {'Content-Type': 'application/json'});
   } catch (e) {
     return _errorResponse('Failed to save config: $e', 500);
-  }
-}
-
-Future<void> _touchCandidate(String id) async {
-  final candidateFile = File(path.join(dataDir, 'candidates', id, 'candidate.json'));
-  if (await candidateFile.exists()) {
-    final data = jsonDecode(await candidateFile.readAsString());
-    final candidate = data['candidate'] ?? data;
-    candidate['updatedAt'] = DateTime.now().toIso8601String();
-    await candidateFile.writeAsString(jsonEncode({'candidate': candidate}));
   }
 }
 
