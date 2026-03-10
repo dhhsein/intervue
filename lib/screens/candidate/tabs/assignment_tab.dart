@@ -63,33 +63,29 @@ class AssignmentTab extends ConsumerWidget {
               _buildHeader(context, ref, assignment),
               const SizedBox(height: AppSpacing.xl),
 
-              // Dates section
-              _buildDatesSection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
-
               // Submission details
               _buildSubmissionSection(context, ref, assignment),
               const SizedBox(height: AppSpacing.xl),
 
               // AI Evaluation
               _buildAiEvaluationSection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Scoring areas
               _buildScoringSection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Git history check
               _buildGitHistorySection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Review call notes
               _buildReviewCallSection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Fraud assessment
               _buildFraudAssessmentSection(context, ref, assignment),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
 
               // Recommendation
               _buildRecommendationSection(
@@ -98,7 +94,7 @@ class AssignmentTab extends ConsumerWidget {
                 assignment,
                 candidateName,
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xxl),
             ],
           ),
         ),
@@ -304,184 +300,6 @@ Best,
 {interviewer}
 {company}''';
 
-  Widget _buildDatesSection(
-    BuildContext context,
-    WidgetRef ref,
-    AssignmentReview assignment,
-  ) {
-    final dateFormat = DateFormat('MMM d, yyyy');
-    final notifier = ref.read(
-      assignmentReviewNotifierProvider(candidateId).notifier,
-    );
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Timeline', style: AppTypography.titleSmall),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: _buildDateField(
-                  context,
-                  label: 'Sent',
-                  date: assignment.sentAt,
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: assignment.sentAt ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      await notifier.updateSentDate(picked);
-                    }
-                  },
-                  dateFormat: dateFormat,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _buildDateField(
-                  context,
-                  label: 'Due',
-                  date: assignment.dueAt,
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate:
-                          assignment.dueAt ??
-                          DateTime.now().add(const Duration(days: 3)),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      await notifier.updateDueDate(picked);
-                    }
-                  },
-                  dateFormat: dateFormat,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _buildDateField(
-                  context,
-                  label: 'Submitted',
-                  date: assignment.submittedAt,
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: assignment.submittedAt ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      await notifier.updateSubmittedDate(picked);
-                    }
-                  },
-                  dateFormat: dateFormat,
-                  suffix: assignment.submittedAt != null
-                      ? (assignment.onTime ? ' ✓' : ' (late)')
-                      : null,
-                  suffixColor: assignment.onTime
-                      ? AppColors.success
-                      : AppColors.error,
-                ),
-              ),
-            ],
-          ),
-          if (assignment.submittedAt != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Text(
-                  'Submitted on time:',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                ToggleChips(
-                  options: const ['Yes', 'No'],
-                  value: assignment.onTime ? 'Yes' : 'No',
-                  onChanged: (value) {
-                    notifier.updateOnTime(value == 'Yes');
-                  },
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateField(
-    BuildContext context, {
-    required String label,
-    required DateTime? date,
-    required VoidCallback onTap,
-    required DateFormat dateFormat,
-    String? suffix,
-    Color? suffixColor,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.sm),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.surfaceBorder),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: AppTypography.label.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Text(
-                  date != null ? dateFormat.format(date) : 'Not set',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: date != null
-                        ? AppColors.textPrimary
-                        : AppColors.textTertiary,
-                  ),
-                ),
-                if (suffix != null)
-                  Text(
-                    suffix,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: suffixColor ?? AppColors.textSecondary,
-                    ),
-                  ),
-                const Spacer(),
-                const Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: AppColors.textTertiary,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSubmissionSection(
     BuildContext context,
     WidgetRef ref,
@@ -653,66 +471,7 @@ Best,
     AreaScore area,
     AssignmentReviewNotifier notifier,
   ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(area.displayName, style: AppTypography.titleSmall),
-                    const SizedBox(width: AppSpacing.sm),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${area.weight}%',
-                        style: AppTypography.label.copyWith(
-                          color: AppColors.accent,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ScoreSelector(
-                value: area.score,
-                onChanged: (score) {
-                  notifier.updateAreaScore(area.areaId, score);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          AutoSaveTextField(
-            initialValue: area.notes,
-            hint: 'Notes for ${area.displayName.toLowerCase()}...',
-            maxLines: null,
-            readOnly: true,
-            onSave: (value) async {
-              await notifier.updateAreaNotes(
-                area.areaId,
-                value.isEmpty ? null : value,
-              );
-            },
-          ),
-        ],
-      ),
-    );
+    return _AreaScoreCard(area: area, notifier: notifier);
   }
 
   Widget _buildGitHistorySection(
@@ -1762,6 +1521,143 @@ IMPORTANT:
 - Reference specific files and code patterns in your notes.
 - The supplementary analysis notes should be detailed enough to inform a debrief conversation.
 - Debrief questions MUST reference actual code from the repository, not generic questions.''';
+}
+
+class _AreaScoreCard extends StatefulWidget {
+  final AreaScore area;
+  final AssignmentReviewNotifier notifier;
+
+  const _AreaScoreCard({required this.area, required this.notifier});
+
+  @override
+  State<_AreaScoreCard> createState() => _AreaScoreCardState();
+}
+
+class _AreaScoreCardState extends State<_AreaScoreCard> {
+  bool _notesExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final area = widget.area;
+    final hasNotes = area.notes != null && area.notes!.isNotEmpty;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text(area.displayName, style: AppTypography.titleSmall),
+                      const SizedBox(width: AppSpacing.sm),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${area.weight}%',
+                          style: AppTypography.label.copyWith(
+                            color: AppColors.accent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ScoreSelector(
+                  value: area.score,
+                  onChanged: (score) {
+                    widget.notifier.updateAreaScore(area.areaId, score);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const Divider(color: AppColors.surfaceBorder, height: 1),
+          InkWell(
+            onTap: () => setState(() => _notesExpanded = !_notesExpanded),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.notes,
+                    size: 16,
+                    color: AppColors.textTertiary,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    hasNotes ? 'Notes' : 'Add notes',
+                    style: AppTypography.label.copyWith(
+                      color: hasNotes
+                          ? AppColors.textSecondary
+                          : AppColors.textTertiary,
+                    ),
+                  ),
+                  if (hasNotes) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.accent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  Icon(
+                    _notesExpanded ? Icons.expand_less : Icons.expand_more,
+                    size: 18,
+                    color: AppColors.textTertiary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_notesExpanded)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.md,
+                right: AppSpacing.md,
+                bottom: AppSpacing.md,
+              ),
+              child: AutoSaveTextField(
+                initialValue: area.notes,
+                hint: 'Notes for ${area.displayName.toLowerCase()}...',
+                maxLines: null,
+                readOnly: false,
+                onSave: (value) async {
+                  await widget.notifier.updateAreaNotes(
+                    area.areaId,
+                    value.isEmpty ? null : value,
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class _SupplementaryTile extends StatefulWidget {
