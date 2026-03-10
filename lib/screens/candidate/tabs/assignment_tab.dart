@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../data/debrief_questions.dart';
 import '../../../models/assignment_review.dart';
 import '../../../models/candidate.dart';
 import '../../../providers/assignment_provider.dart';
@@ -1205,6 +1206,10 @@ Best,
           const SizedBox(height: AppSpacing.md),
           _buildDebriefQuestions(debriefQuestions),
         ],
+
+        // Static interviewer debrief guide
+        const SizedBox(height: AppSpacing.md),
+        _buildInterviewerDebriefGuide(),
       ],
     );
   }
@@ -1291,7 +1296,7 @@ Best,
         children: [
           Text(
             'AI-Generated Debrief Questions',
-            style: AppTypography.titleSmall,
+            style: AppTypography.titleMedium,
           ),
           const SizedBox(height: AppSpacing.md),
           ...questions.asMap().entries.map((entry) {
@@ -1314,6 +1319,7 @@ Best,
                   Text(
                     '$idx. $question',
                     style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1324,14 +1330,14 @@ Best,
                       children: [
                         const Icon(
                           Icons.check_circle_outline,
-                          size: 16,
+                          size: 18,
                           color: AppColors.success,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             whatToLookFor,
-                            style: AppTypography.bodyMedium.copyWith(
+                            style: AppTypography.bodyLarge.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -1346,14 +1352,14 @@ Best,
                       children: [
                         const Icon(
                           Icons.flag_outlined,
-                          size: 16,
+                          size: 18,
                           color: AppColors.error,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             redFlags,
-                            style: AppTypography.bodyMedium.copyWith(
+                            style: AppTypography.bodyLarge.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -1365,6 +1371,83 @@ Best,
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInterviewerDebriefGuide() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.menu_book_rounded,
+                  size: 22,
+                  color: AppColors.info,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    'Interviewer Debrief Guide',
+                    style: AppTypography.titleMedium.copyWith(
+                      color: AppColors.info,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${kDebriefQuestions.length} questions',
+                  style: AppTypography.label.copyWith(
+                    color: AppColors.info.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(color: AppColors.surfaceBorder, height: 1),
+          ...kDebriefQuestions.asMap().entries.map((entry) {
+            final idx = entry.key + 1;
+            final q = entry.value;
+            return _DebriefQuestionTile(idx: idx, question: q);
+          }),
+          Container(
+            margin: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.lightbulb_outline,
+                  size: 16,
+                  color: AppColors.info,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    kDebriefTip,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.info,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -1734,4 +1817,139 @@ IMPORTANT:
 - Reference specific files and code patterns in your notes.
 - The supplementary analysis notes should be detailed enough to inform a debrief conversation.
 - Debrief questions MUST reference actual code from the repository, not generic questions.''';
+}
+
+class _DebriefQuestionTile extends StatefulWidget {
+  final int idx;
+  final Map<String, String> question;
+
+  const _DebriefQuestionTile({required this.idx, required this.question});
+
+  @override
+  State<_DebriefQuestionTile> createState() => _DebriefQuestionTileState();
+}
+
+class _DebriefQuestionTileState extends State<_DebriefQuestionTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = widget.question;
+    final whatToLookFor = q['whatToLookFor'];
+    final redFlags = q['redFlags'];
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${widget.idx}',
+                    style: AppTypography.label.copyWith(
+                      color: AppColors.info,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    q['question'] ?? '',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expanded)
+          Container(
+            margin: const EdgeInsets.only(
+              left: AppSpacing.md,
+              right: AppSpacing.md,
+              bottom: AppSpacing.sm,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (whatToLookFor != null) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline,
+                        size: 18,
+                        color: AppColors.success,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          whatToLookFor,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (redFlags != null) ...[
+                  if (whatToLookFor != null)
+                    const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.flag_outlined,
+                        size: 18,
+                        color: AppColors.error,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          redFlags,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        const Divider(color: AppColors.surfaceBorder, height: 1),
+      ],
+    );
+  }
 }
