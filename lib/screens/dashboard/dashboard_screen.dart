@@ -17,8 +17,9 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 
 enum DashboardSort { name, dateAdded }
 
-final dashboardSortProvider =
-    StateProvider<DashboardSort>((ref) => DashboardSort.dateAdded);
+final dashboardSortProvider = StateProvider<DashboardSort>(
+  (ref) => DashboardSort.dateAdded,
+);
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -69,9 +70,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       decoration: const BoxDecoration(
         color: AppColors.background,
-        border: Border(
-          bottom: BorderSide(color: AppColors.surfaceBorder),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.surfaceBorder)),
       ),
       child: Row(
         children: [
@@ -122,10 +121,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _showSettingsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => const SettingsDialog(),
-    );
+    showDialog(context: context, builder: (context) => const SettingsDialog());
   }
 
   Widget _buildSortButton() {
@@ -133,8 +129,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final isByName = sort == DashboardSort.name;
     return IconButton(
       onPressed: () {
-        ref.read(dashboardSortProvider.notifier).state =
-            isByName ? DashboardSort.dateAdded : DashboardSort.name;
+        ref.read(dashboardSortProvider.notifier).state = isByName
+            ? DashboardSort.dateAdded
+            : DashboardSort.name;
       },
       icon: Icon(isByName ? Icons.sort_by_alpha : Icons.schedule),
       tooltip: isByName ? 'Sorted by name' : 'Sorted by date added',
@@ -176,10 +173,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           const Icon(Icons.cloud_off, size: 48, color: AppColors.error),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Could not connect to server',
-            style: AppTypography.titleSmall,
-          ),
+          Text('Could not connect to server', style: AppTypography.titleSmall),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Make sure the server is running on localhost:3001',
@@ -226,13 +220,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     // Apply sort to all columns (scheduled keeps meeting-time order when sorting by date)
     if (sort == DashboardSort.name) {
-      for (final list in [screening, scheduled, technical, assignment, finalReview]) {
+      for (final list in [
+        screening,
+        scheduled,
+        technical,
+        assignment,
+        finalReview,
+      ]) {
         _sortedCandidates(list);
       }
     } else {
       _sortedCandidates(screening);
-      scheduled.sort((a, b) => (a.scheduledMeetingTime ?? DateTime.now())
-          .compareTo(b.scheduledMeetingTime ?? DateTime.now()));
+      scheduled.sort(
+        (a, b) => (a.scheduledMeetingTime ?? DateTime.now()).compareTo(
+          b.scheduledMeetingTime ?? DateTime.now(),
+        ),
+      );
       _sortedCandidates(technical);
       _sortedCandidates(assignment);
       _sortedCandidates(finalReview);
@@ -254,7 +257,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: PipelineColumn(
-              title: 'Scheduled',
+              title: 'Scheduling',
               candidates: scheduled,
               onCandidateTap: _navigateToCandidate,
               accentColor: AppColors.stageScheduled,
@@ -295,5 +298,4 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void _navigateToCandidate(Candidate candidate) {
     context.push('/candidate/${candidate.id}');
   }
-
 }

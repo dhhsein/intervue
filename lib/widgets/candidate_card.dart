@@ -91,26 +91,38 @@ class _CandidateCardState extends State<CandidateCard> {
   }
 
   Widget _buildScheduledContent(Candidate candidate) {
+    final grade = candidate.screeningGrade != null
+        ? ScreeningGrade.values.firstWhere(
+            (g) => g.value == candidate.screeningGrade,
+            orElse: () => ScreeningGrade.maybe,
+          )
+        : null;
     final meetingTime = candidate.scheduledMeetingTime;
-    if (meetingTime == null) {
-      return Text('No meeting scheduled', style: AppTypography.bodySmall);
-    }
 
-    final dateFormat = DateFormat('d MMM, h:mm a');
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(
-          Icons.videocam,
-          size: 14,
-          color: AppColors.stageScheduled,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          dateFormat.format(meetingTime),
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.stageScheduled,
-          ),
-        ),
+        GradeIndicator(grade: grade, compact: true),
+        const SizedBox(height: AppSpacing.xs),
+        if (meetingTime != null)
+          Row(
+            children: [
+              const Icon(
+                Icons.videocam,
+                size: 14,
+                color: AppColors.stageScheduled,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                DateFormat('d MMM, h:mm a').format(meetingTime),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.stageScheduled,
+                ),
+              ),
+            ],
+          )
+        else
+          Text('No meeting scheduled', style: AppTypography.bodySmall),
       ],
     );
   }
@@ -176,10 +188,7 @@ class _CandidateCardState extends State<CandidateCard> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color),
       ),
-      child: Text(
-        label,
-        style: AppTypography.label.copyWith(color: color),
-      ),
+      child: Text(label, style: AppTypography.label.copyWith(color: color)),
     );
   }
 
