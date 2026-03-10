@@ -17,6 +17,7 @@ class AssignmentReview {
   FraudAssessment? fraudAssessment;
   String? recommendation;
   AssignmentStatus assignmentStatus;
+  Map<String, dynamic>? aiEvaluation;
 
   AssignmentReview({
     required this.candidateId,
@@ -31,6 +32,7 @@ class AssignmentReview {
     this.fraudAssessment,
     this.recommendation,
     this.assignmentStatus = AssignmentStatus.notSent,
+    this.aiEvaluation,
   });
 
   double get weightedScore {

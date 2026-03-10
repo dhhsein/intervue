@@ -42,6 +42,7 @@ AssignmentReview _$AssignmentReviewFromJson(Map<String, dynamic> json) =>
             json['assignmentStatus'],
           ) ??
           AssignmentStatus.notSent,
+      aiEvaluation: json['aiEvaluation'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$AssignmentReviewToJson(AssignmentReview instance) =>
@@ -58,6 +59,7 @@ Map<String, dynamic> _$AssignmentReviewToJson(AssignmentReview instance) =>
       'fraudAssessment': instance.fraudAssessment,
       'recommendation': instance.recommendation,
       'assignmentStatus': _$AssignmentStatusEnumMap[instance.assignmentStatus]!,
+      'aiEvaluation': instance.aiEvaluation,
     };
 
 const _$AssignmentStatusEnumMap = {

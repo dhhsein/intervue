@@ -76,6 +76,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: AssignmentStatus.sent,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -102,6 +103,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: AssignmentStatus.submitted,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -125,6 +127,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: status,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -148,6 +151,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -183,6 +187,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -218,6 +223,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -250,6 +256,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -273,6 +280,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -303,6 +311,7 @@ class AssignmentReviewNotifier
       ),
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -331,6 +340,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: recommendation,
       assignmentStatus: newStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -354,6 +364,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -378,6 +389,7 @@ class AssignmentReviewNotifier
       recommendation: current.recommendation,
       assignmentStatus:
           date != null ? AssignmentStatus.sent : AssignmentStatus.notSent,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -401,6 +413,75 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: current.assignmentStatus,
+      aiEvaluation: current.aiEvaluation,
+    );
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
+  /// Apply AI evaluation JSON — auto-fills scores, git check, fraud, recommendation.
+  Future<void> applyAiEvaluation(Map<String, dynamic> eval) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    // Parse area scores from AI output
+    final areaScores = Map<String, AreaScore>.from(current.areaScores);
+    final aiScores = eval['areaScores'] as Map<String, dynamic>?;
+    if (aiScores != null) {
+      for (final entry in aiScores.entries) {
+        final data = entry.value as Map<String, dynamic>;
+        final existing = areaScores[entry.key];
+        if (existing != null) {
+          areaScores[entry.key] = AreaScore(
+            areaId: existing.areaId,
+            displayName: existing.displayName,
+            weight: existing.weight,
+            score: (data['score'] as num?)?.toInt(),
+            notes: data['notes'] as String?,
+          );
+        }
+      }
+    }
+
+    // Parse git check
+    GitHistoryCheck? gitCheck = current.gitCheck;
+    final aiGit = eval['gitCheck'] as Map<String, dynamic>?;
+    if (aiGit != null) {
+      gitCheck = GitHistoryCheck(
+        commitPattern: aiGit['commitPattern'] as String? ?? 'incremental',
+        suspicious: aiGit['suspicious'] as bool? ?? false,
+        notes: aiGit['notes'] as String?,
+      );
+    }
+
+    // Parse fraud assessment
+    FraudAssessment? fraud = current.fraudAssessment;
+    final aiFraud = eval['fraudAssessment'] as Map<String, dynamic>?;
+    if (aiFraud != null) {
+      fraud = FraudAssessment(
+        level: aiFraud['level'] as String? ?? 'genuine',
+        notes: aiFraud['notes'] as String?,
+      );
+    }
+
+    // Parse recommendation
+    final recommendation =
+        eval['recommendation'] as String? ?? current.recommendation;
+
+    final updated = AssignmentReview(
+      candidateId: current.candidateId,
+      sentAt: current.sentAt,
+      dueAt: current.dueAt,
+      submittedAt: current.submittedAt,
+      onTime: current.onTime,
+      repoLink: current.repoLink,
+      areaScores: areaScores,
+      gitCheck: gitCheck,
+      reviewCallNotes: current.reviewCallNotes,
+      fraudAssessment: fraud,
+      recommendation: recommendation,
+      assignmentStatus: current.assignmentStatus,
+      aiEvaluation: eval,
     );
     state = AsyncData(updated);
     await _save(updated);
@@ -430,6 +511,7 @@ class AssignmentReviewNotifier
       fraudAssessment: current.fraudAssessment,
       recommendation: current.recommendation,
       assignmentStatus: newStatus,
+      aiEvaluation: current.aiEvaluation,
     );
     state = AsyncData(updated);
     await _save(updated);
