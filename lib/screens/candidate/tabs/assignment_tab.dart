@@ -1215,22 +1215,25 @@ Best,
   }
 
   Widget _buildSupplementaryAnalysis(Map<String, dynamic> supplementary) {
-    final labels = {
+    const labels = {
       'errorHandling': 'Error Handling & Resilience',
       'security': 'Security Practices',
       'documentation': 'Documentation & Readability',
       'projectStructure': 'Project Structure',
     };
 
-    final icons = {
+    const icons = {
       'errorHandling': Icons.shield_outlined,
       'security': Icons.lock_outline,
       'documentation': Icons.description_outlined,
       'projectStructure': Icons.folder_outlined,
     };
 
+    final entries = supplementary.entries
+        .where((e) => e.value != null && e.value.toString().isNotEmpty)
+        .toList();
+
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
@@ -1238,47 +1241,33 @@ Best,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Supplementary Analysis', style: AppTypography.titleSmall),
-          const SizedBox(height: AppSpacing.md),
-          ...supplementary.entries
-              .where((e) => e.value != null && e.value.toString().isNotEmpty)
-              .map(
-                (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        icons[entry.key] ?? Icons.info_outline,
-                        size: 18,
-                        color: AppColors.textTertiary,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              labels[entry.key] ?? entry.key,
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              entry.value.toString(),
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.analytics_outlined,
+                  size: 20,
+                  color: AppColors.warning,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  'Supplementary Analysis',
+                  style: AppTypography.titleMedium.copyWith(
+                    color: AppColors.warning,
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+          const Divider(color: AppColors.surfaceBorder, height: 1),
+          ...entries.map(
+            (entry) => _SupplementaryTile(
+              label: labels[entry.key] ?? entry.key,
+              icon: icons[entry.key] ?? Icons.info_outline,
+              content: entry.value.toString(),
+            ),
+          ),
         ],
       ),
     );
@@ -1286,90 +1275,46 @@ Best,
 
   Widget _buildDebriefQuestions(List<dynamic> questions) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'AI-Generated Debrief Questions',
-            style: AppTypography.titleMedium,
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.auto_awesome,
+                  size: 20,
+                  color: AppColors.warning,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    'AI-Generated Debrief Questions',
+                    style: AppTypography.titleMedium.copyWith(
+                      color: AppColors.warning,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${questions.length} questions',
+                  style: AppTypography.label.copyWith(
+                    color: AppColors.warning.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const Divider(color: AppColors.surfaceBorder, height: 1),
           ...questions.asMap().entries.map((entry) {
             final idx = entry.key + 1;
             final q = entry.value as Map<String, dynamic>;
-            final question = q['question'] as String? ?? '';
-            final whatToLookFor = q['whatToLookFor'] as String?;
-            final redFlags = q['redFlags'] as String?;
-
-            return Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.md),
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$idx. $question',
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (whatToLookFor != null) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.check_circle_outline,
-                          size: 18,
-                          color: AppColors.success,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            whatToLookFor,
-                            style: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  if (redFlags != null) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.flag_outlined,
-                          size: 18,
-                          color: AppColors.error,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            redFlags,
-                            style: AppTypography.bodyLarge.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            );
+            return _AiDebriefQuestionTile(idx: idx, question: q);
           }),
         ],
       ),
@@ -1817,6 +1762,216 @@ IMPORTANT:
 - Reference specific files and code patterns in your notes.
 - The supplementary analysis notes should be detailed enough to inform a debrief conversation.
 - Debrief questions MUST reference actual code from the repository, not generic questions.''';
+}
+
+class _SupplementaryTile extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final String content;
+
+  const _SupplementaryTile({
+    required this.label,
+    required this.icon,
+    required this.content,
+  });
+
+  @override
+  State<_SupplementaryTile> createState() => _SupplementaryTileState();
+}
+
+class _SupplementaryTileState extends State<_SupplementaryTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            child: Row(
+              children: [
+                Icon(widget.icon, size: 18, color: AppColors.warning),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    widget.label,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expanded)
+          Container(
+            margin: const EdgeInsets.only(
+              left: AppSpacing.md,
+              right: AppSpacing.md,
+              bottom: AppSpacing.sm,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              widget.content,
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        const Divider(color: AppColors.surfaceBorder, height: 1),
+      ],
+    );
+  }
+}
+
+class _AiDebriefQuestionTile extends StatefulWidget {
+  final int idx;
+  final Map<String, dynamic> question;
+
+  const _AiDebriefQuestionTile({required this.idx, required this.question});
+
+  @override
+  State<_AiDebriefQuestionTile> createState() => _AiDebriefQuestionTileState();
+}
+
+class _AiDebriefQuestionTileState extends State<_AiDebriefQuestionTile> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = widget.question;
+    final whatToLookFor = q['whatToLookFor'] as String?;
+    final redFlags = q['redFlags'] as String?;
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    '${widget.idx}',
+                    style: AppTypography.label.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    q['question'] as String? ?? '',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Icon(
+                  _expanded ? Icons.expand_less : Icons.expand_more,
+                  size: 20,
+                  color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expanded)
+          Container(
+            margin: const EdgeInsets.only(
+              left: AppSpacing.md,
+              right: AppSpacing.md,
+              bottom: AppSpacing.sm,
+            ),
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (whatToLookFor != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.check_circle_outline,
+                        size: 18,
+                        color: AppColors.success,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          whatToLookFor,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (redFlags != null) ...[
+                  if (whatToLookFor != null)
+                    const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.flag_outlined,
+                        size: 18,
+                        color: AppColors.error,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          redFlags,
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        const Divider(color: AppColors.surfaceBorder, height: 1),
+      ],
+    );
+  }
 }
 
 class _DebriefQuestionTile extends StatefulWidget {
