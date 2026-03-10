@@ -27,8 +27,9 @@ class AssignmentTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final assignmentAsync =
-        ref.watch(assignmentReviewNotifierProvider(candidateId));
+    final assignmentAsync = ref.watch(
+      assignmentReviewNotifierProvider(candidateId),
+    );
     final candidateAsync = ref.watch(candidateDetailProvider(candidateId));
 
     return assignmentAsync.when(
@@ -37,7 +38,8 @@ class AssignmentTab extends ConsumerWidget {
       data: (assignment) => candidateAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
-        data: (detail) => _buildContent(context, ref, assignment, detail.candidate.name),
+        data: (detail) =>
+            _buildContent(context, ref, assignment, detail.candidate.name),
       ),
     );
   }
@@ -89,7 +91,12 @@ class AssignmentTab extends ConsumerWidget {
               const SizedBox(height: AppSpacing.xl),
 
               // Recommendation
-              _buildRecommendationSection(context, ref, assignment, candidateName),
+              _buildRecommendationSection(
+                context,
+                ref,
+                assignment,
+                candidateName,
+              ),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),
@@ -110,10 +117,7 @@ class AssignmentTab extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: Text(
-                'Assignment Review',
-                style: AppTypography.titleLarge,
-              ),
+              child: Text('Assignment Review', style: AppTypography.titleLarge),
             ),
             _buildRecommendationBadge(assignment.recommendation),
           ],
@@ -136,7 +140,9 @@ class AssignmentTab extends ConsumerWidget {
         ),
         child: Text(
           'NOT REVIEWED',
-          style: AppTypography.titleSmall.copyWith(color: AppColors.textTertiary),
+          style: AppTypography.titleSmall.copyWith(
+            color: AppColors.textTertiary,
+          ),
         ),
       );
     }
@@ -233,7 +239,9 @@ class AssignmentTab extends ConsumerWidget {
   Future<void> _copyAssignmentEmail(BuildContext context, WidgetRef ref) async {
     final config = await ref.read(configProvider.future);
     if (!context.mounted) return;
-    final candidateDetail = ref.read(candidateDetailProvider(candidateId)).valueOrNull;
+    final candidateDetail = ref
+        .read(candidateDetailProvider(candidateId))
+        .valueOrNull;
 
     if (config.assignmentBrief == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -246,7 +254,8 @@ class AssignmentTab extends ConsumerWidget {
     }
 
     // Get first name
-    final firstName = candidateDetail?.candidate.name.split(' ').first ?? 'there';
+    final firstName =
+        candidateDetail?.candidate.name.split(' ').first ?? 'there';
 
     // Generate email
     final email = _defaultAssignmentEmailTemplate
@@ -258,8 +267,12 @@ class AssignmentTab extends ConsumerWidget {
     await Clipboard.setData(ClipboardData(text: email));
 
     // Update sent date if not already set
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
-    final assignment = ref.read(assignmentReviewNotifierProvider(candidateId)).valueOrNull;
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
+    final assignment = ref
+        .read(assignmentReviewNotifierProvider(candidateId))
+        .valueOrNull;
     if (assignment?.sentAt == null) {
       await notifier.updateSentDate(DateTime.now());
     }
@@ -296,7 +309,9 @@ Best,
     AssignmentReview assignment,
   ) {
     final dateFormat = DateFormat('MMM d, yyyy');
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -307,10 +322,7 @@ Best,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Timeline',
-            style: AppTypography.titleSmall,
-          ),
+          Text('Timeline', style: AppTypography.titleSmall),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -342,7 +354,9 @@ Best,
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
-                      initialDate: assignment.dueAt ?? DateTime.now().add(const Duration(days: 3)),
+                      initialDate:
+                          assignment.dueAt ??
+                          DateTime.now().add(const Duration(days: 3)),
                       firstDate: DateTime(2020),
                       lastDate: DateTime(2030),
                     );
@@ -374,8 +388,9 @@ Best,
                   suffix: assignment.submittedAt != null
                       ? (assignment.onTime ? ' ✓' : ' (late)')
                       : null,
-                  suffixColor:
-                      assignment.onTime ? AppColors.success : AppColors.error,
+                  suffixColor: assignment.onTime
+                      ? AppColors.success
+                      : AppColors.error,
                 ),
               ),
             ],
@@ -471,7 +486,9 @@ Best,
     WidgetRef ref,
     AssignmentReview assignment,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -482,10 +499,7 @@ Best,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Submission',
-            style: AppTypography.titleSmall,
-          ),
+          Text('Submission', style: AppTypography.titleSmall),
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
@@ -515,7 +529,8 @@ Best,
                 IconButton(
                   onPressed: () {
                     Clipboard.setData(
-                        ClipboardData(text: assignment.repoLink!));
+                      ClipboardData(text: assignment.repoLink!),
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Repository link copied'),
@@ -558,7 +573,9 @@ Best,
     WidgetRef ref,
     AssignmentReview assignment,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
     final sortedAreas = assignment.areaScores.values.toList()
       ..sort((a, b) => b.weight.compareTo(a.weight));
 
@@ -573,20 +590,18 @@ Best,
         const SizedBox(height: AppSpacing.md),
 
         // Individual area scores
-        ...sortedAreas.map((area) => _buildAreaScoreCard(
-              context,
-              ref,
-              area,
-              notifier,
-            )),
+        ...sortedAreas.map(
+          (area) => _buildAreaScoreCard(context, ref, area, notifier),
+        ),
       ],
     );
   }
 
   Widget _buildWeightedScoreCard(AssignmentReview assignment) {
     final weightedScore = assignment.weightedScore;
-    final scoredCount =
-        assignment.areaScores.values.where((a) => a.score != null).length;
+    final scoredCount = assignment.areaScores.values
+        .where((a) => a.score != null)
+        .length;
     final totalCount = assignment.areaScores.length;
 
     return Container(
@@ -652,10 +667,7 @@ Best,
               Expanded(
                 child: Row(
                   children: [
-                    Text(
-                      area.displayName,
-                      style: AppTypography.titleSmall,
-                    ),
+                    Text(area.displayName, style: AppTypography.titleSmall),
                     const SizedBox(width: AppSpacing.sm),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -688,10 +700,13 @@ Best,
           AutoSaveTextField(
             initialValue: area.notes,
             hint: 'Notes for ${area.displayName.toLowerCase()}...',
-            maxLines: 2,
+            maxLines: null,
+            readOnly: true,
             onSave: (value) async {
               await notifier.updateAreaNotes(
-                  area.areaId, value.isEmpty ? null : value);
+                area.areaId,
+                value.isEmpty ? null : value,
+              );
             },
           ),
         ],
@@ -704,7 +719,9 @@ Best,
     WidgetRef ref,
     AssignmentReview assignment,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
     final gitCheck = assignment.gitCheck ?? GitHistoryCheck();
 
     return Column(
@@ -760,10 +777,12 @@ Best,
                 initialValue: gitCheck.notes,
                 label: 'Git History Notes',
                 hint: 'Any observations about commit patterns...',
-                maxLines: 2,
+                maxLines: null,
+                readOnly: true,
                 onSave: (value) async {
                   await notifier.updateGitCheck(
-                      notes: value.isEmpty ? null : value);
+                    notes: value.isEmpty ? null : value,
+                  );
                 },
               ),
             ],
@@ -804,7 +823,9 @@ Best,
     WidgetRef ref,
     AssignmentReview assignment,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -820,12 +841,12 @@ Best,
           child: AutoSaveTextField(
             initialValue: assignment.reviewCallNotes,
             label: 'Review Call Notes',
-            hint:
-                'Notes from the code review call with the candidate...',
+            hint: 'Notes from the code review call with the candidate...',
             maxLines: 4,
             onSave: (value) async {
-              await notifier
-                  .updateReviewCallNotes(value.isEmpty ? null : value);
+              await notifier.updateReviewCallNotes(
+                value.isEmpty ? null : value,
+              );
             },
           ),
         ),
@@ -838,7 +859,9 @@ Best,
     WidgetRef ref,
     AssignmentReview assignment,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
     final assessment = assignment.fraudAssessment;
 
     return Column(
@@ -894,10 +917,12 @@ Best,
                 initialValue: assessment?.notes,
                 label: 'Fraud Assessment Notes',
                 hint: 'Any concerns about authenticity...',
-                maxLines: 2,
+                maxLines: null,
+                readOnly: true,
                 onSave: (value) async {
                   await notifier.updateFraudAssessment(
-                      notes: value.isEmpty ? null : value);
+                    notes: value.isEmpty ? null : value,
+                  );
                 },
               ),
             ],
@@ -968,7 +993,9 @@ Best,
     AssignmentReview assignment,
     String candidateName,
   ) {
-    final notifier = ref.read(assignmentReviewNotifierProvider(candidateId).notifier);
+    final notifier = ref.read(
+      assignmentReviewNotifierProvider(candidateId).notifier,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1042,7 +1069,7 @@ Best,
             ),
             child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.auto_awesome,
                   size: 32,
                   color: AppColors.textTertiary,
@@ -1050,14 +1077,14 @@ Best,
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'No AI evaluation yet',
-                  style: AppTypography.bodyMedium.copyWith(
+                  style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Copy the evaluation prompt using the sparkle icon next to the repo link, paste it into an AI tool, then import the JSON result here.',
-                  style: AppTypography.bodySmall.copyWith(
+                  style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textTertiary,
                   ),
                   textAlign: TextAlign.center,
@@ -1101,16 +1128,17 @@ Best,
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.warning.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(Icons.auto_awesome,
-                      size: 20, color: AppColors.warning),
+                  const Icon(
+                    Icons.auto_awesome,
+                    size: 20,
+                    color: AppColors.warning,
+                  ),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -1137,7 +1165,9 @@ Best,
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.textSecondary,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                   ),
                 ],
@@ -1153,7 +1183,7 @@ Best,
                   ),
                   child: Text(
                     reasoning,
-                    style: AppTypography.bodySmall.copyWith(
+                    style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                       fontStyle: FontStyle.italic,
                     ),
@@ -1203,47 +1233,47 @@ Best,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Supplementary Analysis',
-            style: AppTypography.titleSmall,
-          ),
+          Text('Supplementary Analysis', style: AppTypography.titleSmall),
           const SizedBox(height: AppSpacing.md),
           ...supplementary.entries
               .where((e) => e.value != null && e.value.toString().isNotEmpty)
-              .map((entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          icons[entry.key] ?? Icons.info_outline,
-                          size: 16,
-                          color: AppColors.textTertiary,
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                labels[entry.key] ?? entry.key,
-                                style: AppTypography.label.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+              .map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        icons[entry.key] ?? Icons.info_outline,
+                        size: 18,
+                        color: AppColors.textTertiary,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              labels[entry.key] ?? entry.key,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                entry.value.toString(),
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              entry.value.toString(),
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
         ],
       ),
     );
@@ -1283,7 +1313,7 @@ Best,
                 children: [
                   Text(
                     '$idx. $question',
-                    style: AppTypography.bodyMedium.copyWith(
+                    style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1292,13 +1322,16 @@ Best,
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.check_circle_outline,
-                            size: 14, color: AppColors.success),
+                        const Icon(
+                          Icons.check_circle_outline,
+                          size: 16,
+                          color: AppColors.success,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             whatToLookFor,
-                            style: AppTypography.bodySmall.copyWith(
+                            style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -1311,13 +1344,16 @@ Best,
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.flag_outlined,
-                            size: 14, color: AppColors.error),
+                        const Icon(
+                          Icons.flag_outlined,
+                          size: 16,
+                          color: AppColors.error,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             redFlags,
-                            style: AppTypography.bodySmall.copyWith(
+                            style: AppTypography.bodyMedium.copyWith(
                               color: AppColors.textSecondary,
                             ),
                           ),
@@ -1341,11 +1377,11 @@ Best,
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.auto_awesome, color: AppColors.warning, size: 20),
-            const SizedBox(width: AppSpacing.sm),
-            const Text('Import AI Evaluation'),
+            SizedBox(width: AppSpacing.sm),
+            Text('Import AI Evaluation'),
           ],
         ),
         content: SizedBox(
@@ -1372,7 +1408,8 @@ Best,
                     color: AppColors.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    hintText: '{\n  "areaScores": { ... },\n  "gitCheck": { ... },\n  ...\n}',
+                    hintText:
+                        '{\n  "areaScores": { ... },\n  "gitCheck": { ... },\n  ...\n}',
                     hintStyle: AppTypography.bodySmall.copyWith(
                       fontFamily: 'monospace',
                       color: AppColors.textTertiary,
@@ -1381,15 +1418,19 @@ Best,
                     fillColor: AppColors.surfaceLight,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.surfaceBorder),
+                      borderSide: const BorderSide(
+                        color: AppColors.surfaceBorder,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.surfaceBorder),
+                      borderSide: const BorderSide(
+                        color: AppColors.surfaceBorder,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.accent),
+                      borderSide: const BorderSide(color: AppColors.accent),
                     ),
                   ),
                 ),
@@ -1411,16 +1452,17 @@ Best,
                     .replaceAll(RegExp(r'^```json?\s*', multiLine: true), '')
                     .replaceAll(RegExp(r'^```\s*$', multiLine: true), '')
                     .trim();
-                final parsed =
-                    jsonDecode(cleanJson) as Map<String, dynamic>;
+                final parsed = jsonDecode(cleanJson) as Map<String, dynamic>;
                 final notifier = ref.read(
-                    assignmentReviewNotifierProvider(candidateId).notifier);
+                  assignmentReviewNotifierProvider(candidateId).notifier,
+                );
                 notifier.applyAiEvaluation(parsed);
                 Navigator.of(dialogContext).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
-                        'AI evaluation imported — scores, git check, fraud assessment, and recommendation updated'),
+                      'AI evaluation imported — scores, git check, fraud assessment, and recommendation updated',
+                    ),
                     duration: Duration(seconds: 3),
                   ),
                 );
@@ -1451,8 +1493,7 @@ Best,
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
-          Expanded(
-              child: Container(height: 1, color: AppColors.surfaceBorder)),
+          Expanded(child: Container(height: 1, color: AppColors.surfaceBorder)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Text(
@@ -1462,14 +1503,14 @@ Best,
               ),
             ),
           ),
-          Expanded(
-              child: Container(height: 1, color: AppColors.surfaceBorder)),
+          Expanded(child: Container(height: 1, color: AppColors.surfaceBorder)),
         ],
       ),
     );
   }
 
-  static const _evaluationPromptTemplate = '''You are a senior backend engineer conducting a code review of a take-home assignment.
+  static const _evaluationPromptTemplate =
+      '''You are a senior backend engineer conducting a code review of a take-home assignment.
 
 ## Assignment Brief
 

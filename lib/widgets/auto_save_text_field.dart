@@ -13,8 +13,9 @@ class AutoSaveTextField extends ConsumerStatefulWidget {
   final Future<void> Function(String) onSave;
   final int debounceMs;
   final String? hint;
-  final int maxLines;
+  final int? maxLines;
   final String? label;
+  final bool readOnly;
 
   const AutoSaveTextField({
     super.key,
@@ -24,6 +25,7 @@ class AutoSaveTextField extends ConsumerStatefulWidget {
     this.hint,
     this.maxLines = 3,
     this.label,
+    this.readOnly = false,
   });
 
   @override
@@ -104,6 +106,7 @@ class _AutoSaveTextFieldState extends ConsumerState<AutoSaveTextField> {
           controller: _controller,
           style: AppTypography.bodyMedium,
           maxLines: widget.maxLines,
+          readOnly: widget.readOnly,
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: AppTypography.bodyMedium.copyWith(
